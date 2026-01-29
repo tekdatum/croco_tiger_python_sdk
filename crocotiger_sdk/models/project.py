@@ -24,9 +24,5 @@ class Project(BaseModel):
     build_started_at: datetime | None = None
     build_finished_at: datetime | None = None
 
-    def __str__(self) -> str:
-        fields = [f"{field}: {getattr(self, field)}" for field in self.__fields__]
-        return "Project(\n  " + ",\n  ".join(fields) + "\n)"
-
     def is_done(self) -> bool:
         return self.status == ProjectStatus.DONE

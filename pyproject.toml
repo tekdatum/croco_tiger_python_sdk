@@ -4,9 +4,18 @@ version = "0.1.0"
 description = "CrocoTiger SDK"
 readme = "README.md"
 requires-python = ">=3.11"
+optional-dependencies = { test = ["pytest", "pytest-mock"] }
 
 [tool.setuptools.packages.find]
 where = ["crocotiger_sdk"]
+
+
+# PyTest CONFIGURATION
+[tool.pytest.ini_options]
+# Sets the root directory for tests
+testpaths = ["tests"]
+addopts = "-vv --showlocals"
+pythonpath = ["crocotiger_sdk"]
 
 # MYPY CONFIGURATION
 
