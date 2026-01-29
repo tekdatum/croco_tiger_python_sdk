@@ -1,5 +1,5 @@
 from typing import Any
-from utils.rest import RestClient
+from crocotiger_sdk.utils.rest import RestClient
 
 
 class BuilderClient:

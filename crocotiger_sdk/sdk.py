@@ -1,8 +1,8 @@
-from clients.project_client import ProjectClient
-from clients.custom_settings_client import CustomSettingsClient
-from clients.builder_client import BuilderClient
+from crocotiger_sdk.clients.project_client import ProjectClient
+from crocotiger_sdk.clients.custom_settings_client import CustomSettingsClient
+from crocotiger_sdk.clients.builder_client import BuilderClient
 
-from utils.rest import RestClient
+from crocotiger_sdk.utils.rest import RestClient
 
 
 class SDK:

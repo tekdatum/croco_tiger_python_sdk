@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from enums.BuildStep import BuildStep
-from enums.ProjectStatus import ProjectStatus
+from crocotiger_sdk.enums.BuildStep import BuildStep
+from crocotiger_sdk.enums.ProjectStatus import ProjectStatus
 
 from pydantic import BaseModel
 
