@@ -1,0 +1,41 @@
+version = "0.1.0"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# MYPY CONFIGURATION
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+exclude = [
+    "docs/",
+    "venv/",
+    "engine_sdk/"
+]
+
+[[tool.mypy.overrides]]
+module = ["requests.*"]
+ignore_missing_imports = true
+
+# ------------------------------------------------------------------
+
+# RUFF CONFIGURATION
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+# linter configuration
+# E: pycodestyle errors
+# F: Pyflakes
+# I: isort (import sorting)
+# ... https://docs.astral.sh/ruff/rules/
+[tool.ruff.lint]
+select = ["E", "F"] 
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
