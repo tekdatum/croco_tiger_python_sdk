@@ -40,6 +40,17 @@ class RestClient:
         response = requests.post(url, headers=self.headers, json=data)
         return self._handle_response(response)
 
+    def upload_file(
+        self, endpoint: str, file_path: str, params: Optional[Dict[str, Any]] = None
+    ) -> Any:
+        url = self._prepare_url(endpoint)
+        with open(file_path, "rb") as f:
+            files = {"file": f}
+            response = requests.post(
+                url, headers={"Accept": "application/json"}, files=files, params=params
+            )
+        return self._handle_response(response)
+
     def put(self, endpoint: str, data: Dict[str, Any]) -> Any:
         url = self._prepare_url(endpoint)
         response = requests.put(url, headers=self.headers, json=data)
