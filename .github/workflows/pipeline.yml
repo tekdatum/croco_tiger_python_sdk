@@ -1,10 +1,6 @@
 name: CI - Linter, format and tests
 on:
   push:
-      branches:
-        - 'main'
-        - 'release/**'
-        - 'hotfix/**'
   pull_request:
     branches:
       - 'feature/**'
