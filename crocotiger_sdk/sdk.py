@@ -3,7 +3,7 @@ from clients.custom_settings_client import CustomSettingsClient
 from clients.builder_client import BuilderClient
 from clients.fence_client import FenceClient
 
-from crocotiger_sdk.utils.rest import RestClient
+from utils.rest import RestClient
 
 
 class SDK:
