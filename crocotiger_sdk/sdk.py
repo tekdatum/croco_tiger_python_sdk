@@ -1,6 +1,7 @@
 from clients.project_client import ProjectClient
 from clients.custom_settings_client import CustomSettingsClient
 from clients.builder_client import BuilderClient
+from clients.fence_client import FenceClient
 
 from utils.rest import RestClient
 
@@ -18,5 +19,8 @@ class SDK:
 
     def get_builder_client(self) -> BuilderClient:
         return BuilderClient(self._rest_client)
+    
+    def get_fence_client(self) -> FenceClient:
+        return FenceClient(self._rest_client)
 
     # getters for other clients can be added here
