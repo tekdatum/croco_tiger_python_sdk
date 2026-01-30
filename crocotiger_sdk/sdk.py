@@ -19,7 +19,7 @@ class SDK:
 
     def get_builder_client(self) -> BuilderClient:
         return BuilderClient(self._rest_client)
-    
+
     def get_fence_client(self) -> FenceClient:
         return FenceClient(self._rest_client)
 
