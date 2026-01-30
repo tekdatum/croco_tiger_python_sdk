@@ -54,7 +54,10 @@ def test_handle_response_api_error_json(mocker):
 
 
 def test_handle_response_api_error_not_json(mocker):
-    """Verifies that _handle_response falls back to raise_for_status for non-JSON errors."""
+    """
+    Verifies that _handle_response falls back to
+    raise_for_status for non-JSON errors.
+    """
     client = RestClient("http://api.com")
     mock_response = mocker.Mock(spec=requests.Response)
     mock_response.status_code = 500
@@ -131,7 +134,5 @@ def test_delete(mocker):
 
     result = client.delete("/test/1")
 
-    mock_delete.assert_called_once_with(
-        "http://api.com/test/1", headers=client.headers
-    )
+    mock_delete.assert_called_once_with("http://api.com/test/1", headers=client.headers)
     assert result == {"status": "deleted"}
