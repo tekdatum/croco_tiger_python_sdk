@@ -1,4 +1,4 @@
-name: Quality & Tests
+name: CI - Linter, format and tests
 on:
   push:
       branches:
