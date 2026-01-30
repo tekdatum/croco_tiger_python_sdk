@@ -1,9 +1,5 @@
 name: Quality & Tests
 on:
-  push:
-    branches:
-      - 'feature/**'
-      - 'bugfix/**'
   pull_request:
     branches:
       - 'feature/**'
@@ -34,14 +30,13 @@ jobs:
       - name: Run Pytest
         run: pytest --cov=crocotiger_sdk --junitxml=pytest.xml --cov-report=xml:coverage.xml --cov-fail-under=90
 
-      - name: Surface Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always() # Runs even if tests fail
-        with:
-          files: pytest.xml
-
       - name: Pytest Coverage Comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-xml-coverage-path: ./coverage.xml
           junitxml-path: ./pytest.xml
+          title: "Test & Code Coverage Report"
+          badge-title: "Test & Coverage"
+          hide-badge: false
+          hide-report: false
+          create-new-comment: false # Updates the same comment instead of spamming the PR
