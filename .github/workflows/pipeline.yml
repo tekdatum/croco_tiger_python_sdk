@@ -1,0 +1,47 @@
+name: Quality & Tests
+on:
+  push:
+      branches:
+        - 'main'
+        - 'release/**'
+        - 'hotfix/**'
+  pull_request:
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
+
+jobs:
+  qa_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Ruff Check (Linting)
+        run: ruff check .
+
+      - name: Ruff Format (Style)
+        run: ruff format --check .
+
+      - name: Run Pytest
+        run: pytest --cov=crocotiger_sdk --junitxml=pytest.xml --cov-report=xml:coverage.xml --cov-fail-under=90
+
+      - name: Pytest Coverage Comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-xml-coverage-path: ./coverage.xml
+          junitxml-path: ./pytest.xml
+          title: "Test & Code Coverage Report"
+          badge-title: "Test & Coverage"
+          hide-badge: false
+          hide-report: false
+          create-new-comment: false # Updates the same comment instead of spamming the PR
