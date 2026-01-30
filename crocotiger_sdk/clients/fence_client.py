@@ -8,5 +8,7 @@ class FenceClient:
         self._endpoint = "/fence"
 
     def validate(self, project_id: int, text: str) -> FenceValidation:
-        data = self._rest_client.post(f"{self._endpoint}/validate/${project_id}", data={"text": text})
+        data = self._rest_client.post(
+            f"{self._endpoint}/validate/${project_id}", data={"text": text}
+        )
         return FenceValidation(**data)
