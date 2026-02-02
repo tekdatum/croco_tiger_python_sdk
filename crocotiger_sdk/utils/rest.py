@@ -2,7 +2,7 @@ import requests
 
 from typing import Any, Dict, Optional
 
-
+from models.error import ApiErrorResponse
 class RestClient:
     def __init__(self, base_path: str):
         self.base_path = base_path.rstrip("/")
@@ -16,9 +16,7 @@ class RestClient:
             json_response = response.json()
             return json_response["data"] if "data" in json_response else json_response
         try:
-            error_data = response.json()
-            # TODO: Consider using ApiErrorResponse model here
-            raise Exception(f"API Error {response.status_code}: {error_data}")
+            raise ApiErrorResponse.from_response(response)
         except ValueError:
             response.raise_for_status()
 
@@ -38,6 +36,17 @@ class RestClient:
     def post(self, endpoint: str, data: Dict[str, Any]) -> Any:
         url = self._prepare_url(endpoint)
         response = requests.post(url, headers=self.headers, json=data)
+        return self._handle_response(response)
+
+    def upload_file(
+        self, endpoint: str, file_path: str, params: Optional[Dict[str, Any]] = None
+    ) -> Any:
+        url = self._prepare_url(endpoint)
+        with open(file_path, "rb") as f:
+            files = {"file": f}
+            response = requests.post(
+                url, headers={"Accept": "application/json"}, files=files, params=params
+            )
         return self._handle_response(response)
 
     def put(self, endpoint: str, data: Dict[str, Any]) -> Any:
