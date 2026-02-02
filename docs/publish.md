@@ -6,21 +6,8 @@ This document outlines the necessary steps to update and publish the library to 
 
 Before starting, ensure you have the following:
 
-1.  **Conda Installed**: You must have Anaconda or Miniconda installed on your system.
+1. Install and activate the environment, this is described in the [setup](./setup.md) guide.
 2.  **PyPI Token**: A valid API token from your [PyPI account](https://pypi.org/manage/account/token/).
-
-## Environment Setup
-
-1.  **Create the Conda Environment** (if it doesn't exist):
-    Navigate to the `pip` directory and run:
-    ```bash
-    conda env create -f environment.yml
-    ```
-
-2.  **Activate the Environment** (Required):
-    ```bash
-    conda activate crocotiger_sdk
-    ```
 
 ## Publishing Process
 
@@ -48,7 +35,7 @@ export PYPI_TOKEN=pypi-yourtokenstringhere...
 
 ### 3. Run the Publish Script
 
-Make sure the conda environment is activated (`conda activate crocotiger_sdk`) inside your terminal.
+Make sure the environment is activated inside your terminal.
 
 Execute the `publish.sh` script. This script will:
 - Clean previous distributions (`dist/`).
