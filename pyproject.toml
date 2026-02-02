@@ -22,6 +22,8 @@ pythonpath = ["crocotiger_sdk"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
+mypy_path = "crocotiger_sdk"
+explicit_package_bases = true
 
 exclude = [
     "docs/",

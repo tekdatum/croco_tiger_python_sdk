@@ -28,6 +28,9 @@ jobs:
       - name: Ruff Format (Style)
         run: ruff format --check .
 
+      - name: MyPy (Hints)
+        run: mypy ./crocotiger_sdk
+
       - name: Run Pytest
         run: pytest --cov=crocotiger_sdk --junitxml=pytest.xml --cov-report=xml:coverage.xml --cov-fail-under=90
 
