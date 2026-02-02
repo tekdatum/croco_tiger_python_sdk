@@ -1,6 +1,7 @@
 import pytest
 import requests
 from utils.rest import RestClient  # Adjust based on your file structure
+from models.error import ApiErrorResponse
 
 
 def test_init():
@@ -45,12 +46,16 @@ def test_handle_response_api_error_json(mocker):
     client = RestClient("http://api.com")
     mock_response = mocker.Mock(spec=requests.Response)
     mock_response.status_code = 400
-    mock_response.json.return_value = {"error": "bad request"}
+    mock_response.reason = "Bad Request"
+    mock_response.json.return_value = {"status": "fail", "message": "invalid input"}
 
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(ApiErrorResponse) as excinfo:
         client._handle_response(mock_response)
-    assert "API Error 400" in str(excinfo.value)
-    assert "bad request" in str(excinfo.value)
+
+    assert excinfo.value.code == 400
+    assert excinfo.value.status == "fail"
+    assert "invalid input" in excinfo.value.message
+    assert str(excinfo.value) == f"<ApiErrorResponse 400: invalid input>"
 
 
 def test_handle_response_api_error_not_json(mocker):
@@ -61,11 +66,16 @@ def test_handle_response_api_error_not_json(mocker):
     client = RestClient("http://api.com")
     mock_response = mocker.Mock(spec=requests.Response)
     mock_response.status_code = 500
-    # Simulate JSON decoding failure
+    mock_response.reason = "Internal Server Error"
+    mock_response.text = "Internal server error in plain text"
     mock_response.json.side_effect = ValueError("No JSON")
 
-    client._handle_response(mock_response)
-    mock_response.raise_for_status.assert_called_once()
+    with pytest.raises(ApiErrorResponse) as excinfo:
+        client._handle_response(mock_response)
+
+    assert excinfo.value.code == 500
+    assert excinfo.value.message == "Internal server error in plain text"
+    assert excinfo.value.details == {"message": "Internal server error in plain text"}
 
 
 def test_get(mocker):
