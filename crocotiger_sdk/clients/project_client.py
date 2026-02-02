@@ -1,3 +1,4 @@
+from typing import Any
 from models.project import Project
 from utils.rest import RestClient
 
@@ -65,5 +66,11 @@ class ProjectClient:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}")
         return Project(**data)
 
-    def upload_chained_zip(self, project_id: int, file_path: str) -> None:
-        raise NotImplementedError("Upload of chained zip is not implemented yet.")
+    def upload_chained_zip(
+        self, project_id: int, file_path: str, rewrite: bool = False
+    ) -> dict[str, Any]:
+        data = self._rest_client.upload_file(
+            f"{self._endpoint}/{project_id}/zip/chain?rewrite={str(rewrite).lower()}",
+            file_path=file_path,
+        )
+        return dict(data)
