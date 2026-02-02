@@ -3,6 +3,8 @@ import requests
 from typing import Any, Dict, Optional
 
 from models.error import ApiErrorResponse
+
+
 class RestClient:
     def __init__(self, base_path: str):
         self.base_path = base_path.rstrip("/")
