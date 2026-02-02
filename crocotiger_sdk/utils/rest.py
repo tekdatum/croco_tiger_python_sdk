@@ -2,7 +2,7 @@ import requests
 
 from typing import Any, Dict, Optional
 
-from crocotiger_sdk.models.error import ApiErrorResponse
+from models.error import ApiErrorResponse
 class RestClient:
     def __init__(self, base_path: str):
         self.base_path = base_path.rstrip("/")
