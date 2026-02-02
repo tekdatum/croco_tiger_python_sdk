@@ -2,7 +2,7 @@ import requests
 
 from typing import Any, Dict, Optional
 
-
+from models.error import ApiErrorResponse
 class RestClient:
     def __init__(self, base_path: str):
         self.base_path = base_path.rstrip("/")
@@ -16,9 +16,7 @@ class RestClient:
             json_response = response.json()
             return json_response["data"] if "data" in json_response else json_response
         try:
-            error_data = response.json()
-            # TODO: Consider using ApiErrorResponse model here
-            raise Exception(f"API Error {response.status_code}: {error_data}")
+            raise ApiErrorResponse.from_response(response)
         except ValueError:
             response.raise_for_status()
 
