@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "crocotiger_sdk"
 version = "0.1.0"
@@ -5,6 +9,13 @@ description = "CrocoTiger SDK"
 readme = "README.md"
 requires-python = ">=3.11"
 optional-dependencies = { test = ["pytest", "pytest-mock"] }
+authors = [{ name="Tekdatum", email="tools@tekdatum.com" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = []
 
 [tool.setuptools.packages.find]
 where = ["crocotiger_sdk"]
