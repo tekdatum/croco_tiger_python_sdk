@@ -1,10 +1,6 @@
-name: Quality & Tests
+name: CI - Linter, format and tests
 on:
   push:
-      branches:
-        - 'main'
-        - 'release/**'
-        - 'hotfix/**'
   pull_request:
     branches:
       - 'feature/**'
@@ -32,16 +28,27 @@ jobs:
       - name: Ruff Format (Style)
         run: ruff format --check .
 
+      - name: MyPy (Hints)
+        run: mypy ./crocotiger_sdk
+
       - name: Run Pytest
         run: pytest --cov=crocotiger_sdk --junitxml=pytest.xml --cov-report=xml:coverage.xml --cov-fail-under=90
 
-      - name: Pytest Coverage Comment
-        uses: MishaKav/pytest-coverage-comment@main
+      - name: Surface Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always() # Runs even if tests fail
         with:
-          pytest-xml-coverage-path: ./coverage.xml
-          junitxml-path: ./pytest.xml
-          title: "Test & Code Coverage Report"
-          badge-title: "Test & Coverage"
-          hide-badge: false
-          hide-report: false
-          create-new-comment: false # Updates the same comment instead of spamming the PR
+          files: pytest.xml
+
+      - name: Add Coverage PR Comment
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          output: both
+
+      - name: Write to Job Summary
+        # This takes the output from the plugin and puts it on the Actions page
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY

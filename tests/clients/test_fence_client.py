@@ -19,24 +19,26 @@ def test_init(mock_rest_client):
 def test_validate(mock_rest_client):
     """Verifies validate calls post with full payload and returns FenceValidation."""
     client = FenceClient(mock_rest_client)
-    
+
     # Mock data strictly matching FenceValidation fields
     mock_data = {
         "text": "Some text",
         "valid": True,
         "reason_code": "OK",
-        "duration": 0.5
+        "duration": 0.5,
     }
     mock_rest_client.post.return_value = mock_data
-    
+
     project_id = 123
     text_to_validate = "Some text"
-    
+
     result = client.validate(project_id, text_to_validate)
-    
+
     assert isinstance(result, FenceValidation)
     assert result.text == mock_data["text"]
     assert result.valid == mock_data["valid"]
-    
+
     expected_url = f"/fence/validate/{project_id}"
-    mock_rest_client.post.assert_called_once_with(expected_url, data={"text": text_to_validate})
+    mock_rest_client.post.assert_called_once_with(
+        expected_url, data={"text": text_to_validate}
+    )
