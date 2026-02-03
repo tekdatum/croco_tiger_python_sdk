@@ -1,4 +1,3 @@
-import os
 import zipfile
 import pytest
 from datetime import datetime
@@ -113,21 +112,18 @@ def test_find_one(mock_rest_client, sample_project_data):
 def test_upload_chained_zip(mock_rest_client, tmp_path):
     """Verifies upload_chained_zip uploads the file and returns response dict."""
     client = ProjectClient(mock_rest_client)
-    
+
     d = tmp_path / "data"
     d.mkdir()
     zip_file = d / "test.zip"
-    
-    with zipfile.ZipFile(zip_file, 'w') as zipf:
-        zipf.writestr('test.txt', 'This is a test file')
 
-    api_response = {
-        "name": "data.zip", 
-        "size": 1024
-    }
+    with zipfile.ZipFile(zip_file, "w") as zipf:
+        zipf.writestr("test.txt", "This is a test file")
+
+    api_response = {"name": "data.zip", "size": 1024}
     mock_rest_client.upload_file.return_value = api_response
     result = client.upload_chained_zip(1, str(zip_file), rewrite=False)
-    
+
     assert result["name"] == "data.zip"
     assert isinstance(result["size"], int)
     assert result == api_response
