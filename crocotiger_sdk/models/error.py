@@ -34,15 +34,6 @@ class ApiErrorResponse(Exception):
         except ValueError:
             return "Unknown Error"
 
-    def to_dict(self) -> dict:
-        return {
-            "status": self.status,
-            "message": self.message,
-            "code": self.code,
-            "error_type": self.error_type,
-            "details": self.details,
-        }
-
     @classmethod
     def from_response(cls, response: requests.Response) -> "ApiErrorResponse":
         try:
