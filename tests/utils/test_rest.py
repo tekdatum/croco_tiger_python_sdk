@@ -55,7 +55,7 @@ def test_handle_response_api_error_json(mocker):
     assert excinfo.value.code == 400
     assert excinfo.value.status == "fail"
     assert "invalid input" in excinfo.value.message
-    assert str(excinfo.value) == f"<ApiErrorResponse 400: invalid input>"
+    assert str(excinfo.value) == "<ApiErrorResponse 400: invalid input>"
 
 
 def test_handle_response_api_error_not_json(mocker):
