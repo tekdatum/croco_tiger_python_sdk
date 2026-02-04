@@ -2,23 +2,6 @@
 
 This is the official Python SDK for CrocoTiger Engine API. It allows developers to easily integrate CrocoTiger's powerful semantic fence capabilities into their Python applications.
 
-## Setup & Development (VENV)
-
-1. Navigate to the sdk folder and create the venv:
-    ```bash
-    python3 -m venv engine_sdk
-    ```
-
-2. Activate the virtual environment:
-    ```bash
-    source engine_sdk/bin/activate
-    ```
-
-3. Install dependencies:
-    ```bash
-    python -m pip install -r requirements.txt
-    ```
-
 ---
 ## Usage [WIP - need to define the pypi package name]
 To use the CrocoTiger SDK, first install it via pip:
