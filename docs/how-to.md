@@ -80,4 +80,23 @@ accept_list = builder_client.find_project_accept_list(1)
 print(accept_list)
 ```
 
-# TODO: Add examples for other clients
+## Fence Client
+The Fence Client allows you to validate text against a project's fence rules.
+
+**Available methods**:
+  - `validate`: Validate text to check if it complies with the project's fence rules.
+
+**Usage**:
+
+```python
+from sdk import SDK
+
+sdk = SDK()
+fence_client = sdk.get_fence_client()
+
+# Validate text for a project (e.g. project_id=1)
+validation_result = fence_client.validate(project_id=1, text="Text to validate")
+
+print(f"Valid: {validation_result.valid}")
+print(f"Reason: {validation_result.reason_code}")
+```
