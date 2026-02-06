@@ -1,10 +1,11 @@
 import zipfile
 import pytest
 from datetime import datetime
-from clients.project_client import ProjectClient
-from models.project import Project
-from enums.ProjectStatus import ProjectStatus
-from enums.BuildStep import BuildStep
+
+from crocotiger.clients.project_client import ProjectClient
+from crocotiger.enums.build_step import BuildStep
+from crocotiger.enums.project_status import ProjectStatus
+from crocotiger.models.project import Project
 
 
 @pytest.fixture

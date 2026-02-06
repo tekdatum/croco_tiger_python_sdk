@@ -1,6 +1,6 @@
 from typing import Any
-from models.project import Project
-from utils.rest import RestClient
+from crocotiger.models.project import Project
+from crocotiger.utils.rest import RestClient
 
 
 class ProjectClient:

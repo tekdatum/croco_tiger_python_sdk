@@ -1,7 +1,8 @@
 import pytest
 import requests
-from utils.rest import RestClient  # Adjust based on your file structure
-from models.error import ApiErrorResponse
+
+from crocotiger.models.error import ApiErrorResponse
+from crocotiger.utils.rest import RestClient  # Adjust based on your file structure
 
 
 def test_init():
