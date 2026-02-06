@@ -61,12 +61,14 @@ def test_find_all(mock_rest_client, sample_project_data):
     """Verifies find_all returns a list of Project objects."""
     client = ProjectClient(mock_rest_client)
     mock_rest_client.get.return_value = [sample_project_data, sample_project_data]
-
-    result = client.find_all()
+    limit = 50
+    offset = 0
+    result = client.find_all(limit, offset)
+    url = f"/project?limit={limit}&offset={offset}"
 
     assert len(result) == 2
     assert isinstance(result[0], Project)
-    mock_rest_client.get.assert_called_once_with("/project/all")
+    mock_rest_client.get.assert_called_once_with(url)
 
 
 def test_update(mock_rest_client, sample_project_data):

@@ -30,8 +30,8 @@ class ProjectClient:
         data = self._rest_client.post(f"{self._endpoint}/create", data=payload)
         return Project(**data)
 
-    def find_all(self) -> list[Project]:
-        data = self._rest_client.get(f"{self._endpoint}/all")
+    def find_all(self, limit: int, offset: int) -> list[Project]:
+        data = self._rest_client.get(f"{self._endpoint}?limit={limit}&offset={offset}")
         return [Project(**item) for item in data]
 
     def update(
