@@ -1,7 +1,8 @@
 import pytest
 from datetime import datetime
-from clients.custom_settings_client import CustomSettingsClient
-from models.custom_settings import CustomSettings
+
+from crocotiger.clients.custom_settings_client import CustomSettingsClient
+from crocotiger.models.custom_settings import CustomSettings
 
 
 @pytest.fixture

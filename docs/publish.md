@@ -13,6 +13,12 @@ Before starting, ensure you have the following:
 
 Follow these steps to publish a new version:
 
+### 0. Make sure peer-dependencies are updated
+
+You need to install pipreqs, `pipreqs src/ --print`, and then add those
+to the toml file in the dependencies section, you could use Gemini or similar to get
+the right syntaxis 
+
 ### 1. Update the Version
 
 Edit the `pyproject.toml` file and update the `version` field under the `[project]` section. Ensure you use semantic versioning (e.g., `0.0.3`).
@@ -47,6 +53,25 @@ bash ./publish.sh
 ```
 
 If successful, you will see output from `twine` confirming the upload.
+
+#### Using testpypi for testing
+
+To avoid adding incorrect version to the main registry you can use your personal
+`test.pypi.com` account to publish the libraries
+
+You can publish to test pypi by adding `--repository tespypi` to the twine upload command 
+
+```bash
+python -m twine upload --repository testpypi dist/*
+```
+
+You can installed from test pypi using this command
+```bash
+pip install --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            crocotiger_sdk==0.1.6
+```
+
 
 ## Troubleshooting
 

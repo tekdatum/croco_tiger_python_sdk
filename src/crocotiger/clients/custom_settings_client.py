@@ -1,5 +1,5 @@
-from models.custom_settings import CustomSettings
-from utils.rest import RestClient
+from crocotiger.models.custom_settings import CustomSettings
+from crocotiger.utils.rest import RestClient
 
 
 class CustomSettingsClient:

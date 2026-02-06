@@ -1,5 +1,6 @@
 from datetime import datetime
-from models.custom_settings import CustomSettings
+
+from crocotiger.models.custom_settings import CustomSettings
 
 
 class TestCustomSettings:

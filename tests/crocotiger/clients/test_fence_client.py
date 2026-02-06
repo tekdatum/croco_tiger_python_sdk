@@ -1,6 +1,7 @@
 import pytest
-from clients.fence_client import FenceClient
-from models.fence_validation import FenceValidation
+
+from crocotiger.clients.fence_client import FenceClient
+from crocotiger.models.fence_validation import FenceValidation
 
 
 @pytest.fixture
