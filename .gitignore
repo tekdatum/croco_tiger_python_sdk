@@ -3,6 +3,7 @@ engine_sdk/
 .venv/
 env/
 crocotiger_sdk/crocotiger_sdk.egg-info
+crocotiger_sdk.egg-info
 __pycache__/
 *.pyc
 .mypy_cache/

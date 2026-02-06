@@ -2,7 +2,7 @@ import requests
 
 from typing import Any, Dict, Optional
 
-from models.error import ApiErrorResponse
+from crocotiger.models.error import ApiErrorResponse
 
 
 class RestClient:

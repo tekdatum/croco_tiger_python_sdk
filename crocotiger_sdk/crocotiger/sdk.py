@@ -1,9 +1,8 @@
-from clients.project_client import ProjectClient
-from clients.custom_settings_client import CustomSettingsClient
-from clients.builder_client import BuilderClient
-from clients.fence_client import FenceClient
-
-from utils.rest import RestClient
+from crocotiger.clients.builder_client import BuilderClient
+from crocotiger.clients.custom_settings_client import CustomSettingsClient
+from crocotiger.clients.fence_client import FenceClient
+from crocotiger.clients.project_client import ProjectClient
+from crocotiger.utils.rest import RestClient
 
 
 class SDK:

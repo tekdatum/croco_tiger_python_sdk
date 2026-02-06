@@ -1,6 +1,6 @@
 # CrocoTiger SDK
 
-This is the official Python SDK for CrocoTiger Engine API. It allows developers to easily integrate CrocoTiger's powerful semantic fence capabilities into their Python applications.
+This is the official Python SDK for CrocoTiger API. It allows developers to easily integrate CrocoTiger's powerful semantic fence capabilities into their Python applications.
 
 ---
 ## Usage [WIP - need to define the pypi package name]
@@ -15,10 +15,20 @@ Then, you can import the SDK and start using it in your Python code:
 ```python
 import crocotiger_sdk as crocotiger
 
-client = crocotiger.SDK(api_url="<YOUR_API_URL>")
+client = crocotiger.SDK(api_url="http://{{ip}}:{{port}}/api/v1/")
 project = client.get_project_client().find_one(1)
 print(project)
 ```
+
+
+## Download a sample docker image
+CrocoTiger offers a development edition docker image with sample projects for development and testing purposes.
+
+1. Install docker
+2. Do `docker pull public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
+3. Do `docker run -d --name croco_tiger_container --gpus all -p 8000:8000 public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
+4. Replace `api_url` with `http://localhost:8000/api/v1/`
+
 
 ## How to use
 
@@ -38,7 +48,7 @@ To interact with projects, you can use the `ProjectClient`. Here's an example of
 **Usage**:
 
 ```python
-from sdk import SDK
+from crocotiger.sdk import SDK
 
 sdk = SDK()
 project_client = sdk.get_project_client()
@@ -57,7 +67,7 @@ Custom settings client allow you to manage the LLM API Keys for your projects.
 **Usage**:
 
 ```python
-from sdk import SDK
+from crocotiger.sdk import SDK
 
 sdk = SDK()
 custom_settings = sdk.get_custom_settings_client().update_custom_settings(
@@ -94,8 +104,10 @@ The Builder Client allows you build and retrieve generated data for your project
     - `find_project_validation_summary`: Retrieve validation summary for a project.
 
 **Usage**:
+
 ```python
-from sdk import SDK
+from crocotiger.sdk import SDK
+
 sdk = SDK()
 builder_client = sdk.get_builder_client()
 accept_list = builder_client.find_project_accept_list(1)
@@ -111,7 +123,7 @@ The Fence Client allows you to validate text against a project's fence rules.
 **Usage**:
 
 ```python
-from sdk import SDK
+from crocotiger.sdk import SDK
 
 sdk = SDK()
 fence_client = sdk.get_fence_client()

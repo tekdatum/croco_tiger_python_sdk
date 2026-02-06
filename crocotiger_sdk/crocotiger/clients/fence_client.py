@@ -1,5 +1,5 @@
-from models.fence_validation import FenceValidation
-from utils.rest import RestClient
+from crocotiger.models.fence_validation import FenceValidation
+from crocotiger.utils.rest import RestClient
 
 
 class FenceClient:
