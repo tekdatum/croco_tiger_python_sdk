@@ -13,9 +13,9 @@ pip install crocotiger_sdk
 Then, you can import the SDK and start using it in your Python code:
 
 ```python
-import crocotiger_sdk as crocotiger
+from crocotiger.sdk import SDK
 
-client = crocotiger.SDK(api_url="http://{{ip}}:{{port}}/api/v1/")
+client = SDK(base_path="http://localhost:8090/api/v1/")
 project = client.get_project_client().find_one(1)
 print(project)
 ```
