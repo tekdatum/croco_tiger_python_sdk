@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crocotiger_sdk" # the project and lib name
-version = "1.0.0"
+version = "0.1.6"
 description = "CrocoTiger SDK"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,10 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-
+    "pydantic>=2.0.0",
+    "requests>=2.31.0",
 ]
-
-
 [tool.setuptools.packages.find]
 where = ["src"] # the source code
 
