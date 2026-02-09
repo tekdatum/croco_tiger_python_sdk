@@ -1,124 +1,174 @@
 # CrocoTiger SDK
 
-This is the official Python SDK for CrocoTiger Engine API. It allows developers to easily integrate CrocoTiger's powerful semantic fence capabilities into their Python applications.
+<p align="center">
+  <a href="https://crocotiger.com" target="_blank">
+    <img src="https://crocotiger.com/shield.png" alt="CrocoTiger Logo" width="100"/>
+  </a>
+</p>
+
+<p align="center">
+    <a href="https://aws.amazon.com/marketplace/pp/prodview-2xe32k5vgnekk" target="_blank">
+        <img src="https://img.shields.io/badge/AWS%20Marketplace-Available-blue?logo=amazonaws" alt="AWS Marketplace"/>
+    </a>
+    <a href="https://pypi.org/project/crocotiger-sdk/" target="_blank">
+        <img src="https://badge.fury.io/py/crocotiger-sdk.svg" alt="PyPI version"/>
+    </a>
+    <a href="https://pypi.org/project/crocotiger-sdk/" target="_blank">
+        <img src="https://img.shields.io/pypi/pyversions/crocotiger-sdk.svg" alt="Python Versions"/>
+    </a>
+    <a href="https://opensource.org/licenses/Apache-2.0" target="_blank">
+        <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"/>
+    </a>
+</p>
+
+This is the official Python SDK for the **CrocoTiger Engine API**.
+
+It allows developers to easily integrate CrocoTiger's powerful **semantic fence capabilities** into their applications, enabling robust validation, project management, and data generation workflows.
 
 ---
-## Usage [WIP - need to define the pypi package name]
+
+## Installation
+
 To use the CrocoTiger SDK, first install it via pip:
 
 ```bash
-pip install crocotiger_sdk
+pip install crocotiger-sdk
 ```
 
-Then, you can import the SDK and start using it in your Python code:
+
+## Quick Start
+
+### 1. Configuration
+
+You can initialize the SDK by passing your API URL directly.
 
 ```python
-import crocotiger_sdk as crocotiger
+from crocotiger_sdk import SDK
 
-client = crocotiger.SDK(api_url="<YOUR_API_URL>")
-project = client.get_project_client().find_one(1)
-print(project)
+client = SDK(api_url="<your_api_url>")
 ```
 
-## How to use
+### 2. Basic Usage (Fence Validation)
 
-The SDK provides various clients to interact with different parts of the Engine API. Below are examples of how to use these clients.
-
-## Project Client
-To interact with projects, you can use the `ProjectClient`. Here's an example of how to retrieve a project by its ID:
-
-**Available methods**:
-  - `create`: Create a new project.
-  - `find_all`: Retrieve all projects.
-  - `update`: Update an existing project.
-  - `delete`: Delete a project by its ID.
-  - `find_one`: Retrieve a single project by its ID.
-  - `upload_chained_zip`: (Not implemented) Upload a chained zip file for the project.
-
-**Usage**:
+The most common use case is validating text against a project's fence rules.
 
 ```python
-from sdk import SDK
+from crocotiger_sdk import SDK
 
-sdk = SDK()
-project_client = sdk.get_project_client()
-project = project_client.find_one(1)
-print(project)
-```
+client = SDK(api_url="https://api.crocotiger.com")
+fence_client = client.get_fence_client()
 
-## Custom Settings Client
-Custom settings client allow you to manage the LLM API Keys for your projects. 
-
-**Available methods**:
-  - `update_custom_settings`: Update the custom settings with new LLM API keys.
-  - `clear_llms_keys`: Clear all LLM API keys from the custom settings.
-  - `find_custom_settings`: Retrieve the current custom settings.
-
-**Usage**:
-
-```python
-from sdk import SDK
-
-sdk = SDK()
-custom_settings = sdk.get_custom_settings_client().update_custom_settings(
-    openai_key="sk-xxxx",
-    gemini_key="gemini-xxxx",
+# Validate text for a specific project (e.g., project_id=1)
+validation_result = fence_client.validate(
+    project_id=1, 
+    text="Text to validate"
 )
-custom_settings = sdk.get_custom_settings_client().clear_llms_keys()
-custom_settings = sdk.get_custom_settings_client().find_custom_settings()
-print(custom_settings)
+
+if validation_result.valid:
+    print("✅ Text is valid.")
+else:
+    print(f"❌ Violation detected. Reason: {validation_result.reason_code}")
+
 ```
+
+## Modules
+
+The SDK provides various clients to interact with different parts of the Engine API.
+
+### Project Client
+
+To interact with projects, use the `ProjectClient`. It allows you to create, find, update, and delete projects.
+
+```python
+project_client = client.get_project_client()
+project = project_client.find_one(1)
+print(f"Project Name: {project.name}")
+
+```
+
+**Available methods**:
+| Method | Description |
+| :--- | :--- |
+| `create` | Create a new project. |
+| `find_all` | Retrieve all projects. This allows pagination using limit and offset parameters. |
+| `find_one` | Retrieve a single project by its ID. |
+| `update` | Update an existing project. |
+| `delete` | Delete a project by its ID. |
+
+### Custom Settings Client
+
+The Custom Settings Client allows you to manage the LLM API Keys (e.g., OpenAI, Gemini) for your projects.
+
+```python
+settings_client = client.get_custom_settings_client()
+
+# Update keys
+settings_client.update_custom_settings(
+    openai_key="<your_openai_api_key>",
+    gemini_key="<your_gemini_api_key>",
+)
+
+# Clear or Retrieve keys
+settings_client.clear_llms_keys()
+current_settings = settings_client.find_custom_settings()
+```
+
+**Available methods**:
+
+* `update_custom_settings`: Update the custom settings with new LLM API keys.
+* `clear_llms_keys`: Clear all LLM API keys.
+* `find_custom_settings`: Retrieve the current configuration.
 
 ### Builder Client
-The Builder Client allows you build and retrieve generated data for your projects.
 
-**Available methods**:
- - `build`: Trigger the build process for a project.
+The Builder Client allows you to trigger builds and retrieve generated data (accept/reject lists, logs, and metrics).
 
- - ***List retrieval methods***: these methods allow you to get accept and reject lists samples generated for a project.
-    - `find_project_accept_list`: Retrieve the accept list for a project.
-    - `find_project_reject_list`: Retrieve the reject list for a project.
+**1. Trigger a Build**
 
- - ***General retrieval methods***: these methods allow you to get all filenames of a certain type for a project.
-    - `find_project_logs`: Retrieve all logs filename for a project.
-    - `find_project_testing_metrics`: Retrieve testing metrics filename for a project.
-    - `find_project_validation_metrics`: Retrieve validation metrics filename for a project.
- 
-  - ***Specific item retrieval methods***: these methods allow you to get the specific file you are looking for by its project id and filename.
-    - `find_project_log_by_name`: Retrieve a specific log by name for a project.
-    - `find_project_testing_metrics_by_name`: Retrieve a specific testing metrics file by name for a project. You can also pass a `testing_summary` file name to get the corresponding metrics.
-    - `find_project_validation_metrics_by_name`: Retrieve a specific validation metrics file by name for a project. You can also pass a `validation_summary` file name to get the corresponding metrics.
-  
-  - ***Summary methods***:
-    - `find_project_testing_summary`: Retrieve testing summary for a project.
-    - `find_project_validation_summary`: Retrieve validation summary for a project.
-
-**Usage**:
 ```python
-from sdk import SDK
-sdk = SDK()
-builder_client = sdk.get_builder_client()
+builder_client = client.get_builder_client()
+builder_client.build(project_id=1)
+```
+
+**2. Retrieve Generated Data**
+The client offers specific methods to find lists, logs, and metrics by project ID.
+
+```python
+# Get lists
 accept_list = builder_client.find_project_accept_list(1)
-print(accept_list)
-```
+reject_list = builder_client.find_project_reject_list(1)
 
-### Fence Client
-The Fence Client allows you to validate text against a project's fence rules.
+# Get specific files
+log_file = builder_client.find_project_log_by_name(1, "build_log_v1.txt")
+```
 
 **Available methods**:
-  - `validate`: Validate text to check if it complies with the project's fence rules.
 
-**Usage**:
+* **List Retrieval:**
+* `find_project_accept_list`
+* `find_project_reject_list`
 
-```python
-from sdk import SDK
 
-sdk = SDK()
-fence_client = sdk.get_fence_client()
+* **General Retrieval (Get all filenames):**
+* `find_project_logs`
+* `find_project_testing_metrics`
+* `find_project_validation_metrics`
 
-# Validate text for a project (e.g. project_id=1)
-validation_result = fence_client.validate(project_id=1, text="Text to validate")
 
-print(f"Valid: {validation_result.valid}")
-print(f"Reason: {validation_result.reason_code}")
-```
+* **Specific Item Retrieval:**
+* `find_project_log_by_name`
+* `find_project_testing_metrics_by_name` (Pass a `testing_summary` filename to get metrics)
+* `find_project_validation_metrics_by_name` (Pass a `validation_summary` filename to get metrics)
+
+
+* **Summaries:**
+* `find_project_testing_summary`
+* `find_project_validation_summary`
+
+
+
+---
+
+## 📄 License
+
+This project is licensed under the [Apache-2.0 License](https://opensource.org/licenses/Apache-2.0).
