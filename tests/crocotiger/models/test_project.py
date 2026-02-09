@@ -1,7 +1,8 @@
 from datetime import datetime
-from enums.ProjectStatus import ProjectStatus
-from enums.BuildStep import BuildStep
-from models.project import Project  # Adjust import path as needed
+
+from crocotiger.enums.build_step import BuildStep
+from crocotiger.enums.project_status import ProjectStatus
+from crocotiger.models.project import Project  # Adjust import path as needed
 
 
 class TestProject:

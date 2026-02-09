@@ -1,5 +1,6 @@
 import pytest
-from clients.builder_client import BuilderClient
+
+from crocotiger.clients.builder_client import BuilderClient
 
 
 @pytest.fixture

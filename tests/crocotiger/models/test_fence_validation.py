@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from models.fence_validation import FenceValidation
+from crocotiger.models.fence_validation import FenceValidation
 
 
 class TestFenceValidation:

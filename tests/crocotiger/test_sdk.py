@@ -1,10 +1,10 @@
-from sdk import SDK  # Assuming your file is named sdk.py
+from crocotiger.sdk import SDK
 
 
 class TestSDK:
     def test_sdk_initialization(self, mocker) -> None:
         # Arrange
-        mock_rest = mocker.patch("sdk.RestClient")
+        mock_rest = mocker.patch("crocotiger.sdk.RestClient")
         custom_base = "https://api.example.com/v1/"
 
         # Act
@@ -16,7 +16,7 @@ class TestSDK:
 
     def test_get_project_client(self, mocker) -> None:
         # Arrange
-        mock_client_class = mocker.patch("sdk.ProjectClient")
+        mock_client_class = mocker.patch("crocotiger.sdk.ProjectClient")
         sdk = SDK()
 
         # Act
@@ -28,7 +28,7 @@ class TestSDK:
 
     def test_get_custom_settings_client(self, mocker) -> None:
         # Arrange
-        mock_client_class = mocker.patch("sdk.CustomSettingsClient")
+        mock_client_class = mocker.patch("crocotiger.sdk.CustomSettingsClient")
         sdk = SDK()
 
         # Act
@@ -40,7 +40,7 @@ class TestSDK:
 
     def test_get_builder_client(self, mocker) -> None:
         # Arrange
-        mock_client_class = mocker.patch("sdk.BuilderClient")
+        mock_client_class = mocker.patch("crocotiger.sdk.BuilderClient")
         sdk = SDK()
 
         # Act

@@ -3,8 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "crocotiger_sdk"
-version = "0.1.0"
+name = "crocotiger_sdk" # the project and lib name
+version = "0.1.6"
 description = "CrocoTiger SDK"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,11 +16,12 @@ classifiers = [
 
     "Operating System :: OS Independent",
 ]
-dependencies = []
-
-
+dependencies = [
+    "pydantic>=2.0.0",
+    "requests>=2.31.0",
+]
 [tool.setuptools.packages.find]
-where = ["crocotiger_sdk"]
+where = ["src"] # the source code
 
 
 # PyTest CONFIGURATION
@@ -28,14 +29,14 @@ where = ["crocotiger_sdk"]
 # Sets the root directory for tests
 testpaths = ["tests"]
 addopts = "-vv --showlocals"
-pythonpath = ["crocotiger_sdk"]
+pythonpath = ["src"]
 
 # MYPY CONFIGURATION
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 strict = true
-mypy_path = "crocotiger_sdk"
+mypy_path = "src"
 explicit_package_bases = true
 
 exclude = [

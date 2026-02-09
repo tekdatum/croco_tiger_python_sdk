@@ -29,10 +29,10 @@ jobs:
         run: ruff format --check .
 
       - name: MyPy (Hints)
-        run: mypy ./crocotiger_sdk
+        run: mypy ./src
 
       - name: Run Pytest
-        run: pytest --cov=crocotiger_sdk --junitxml=pytest.xml --cov-report=xml:coverage.xml --cov-fail-under=90
+        run: pytest --cov=src --junitxml=pytest.xml --cov-report=xml:coverage.xml --cov-fail-under=90
 
       - name: Surface Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
