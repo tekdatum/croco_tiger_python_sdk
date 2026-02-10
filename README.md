@@ -39,7 +39,7 @@ To interact with projects, you can use the `ProjectClient`. Here's an example of
 
 **Available methods**:
   - `create`: Create a new project.
-  - `find_all`: Retrieve all projects.
+  - `find_all`: Retrieve all projects. This method supports pagination through `limit` and `offset` parameters.
   - `update`: Update an existing project.
   - `delete`: Delete a project by its ID.
   - `find_one`: Retrieve a single project by its ID.
