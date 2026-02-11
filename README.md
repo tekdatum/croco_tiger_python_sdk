@@ -101,6 +101,7 @@ print(f"Project Name: {project.name}")
 | `find_one` | Retrieve a single project by its ID. |
 | `update` | Update an existing project. |
 | `delete` | Delete a project by its ID. |
+| `upload_zip` | Upload a zip file for the project. |
 
 ### Custom Settings Client
 
