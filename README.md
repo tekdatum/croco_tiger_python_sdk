@@ -3,7 +3,7 @@
 This is the official Python SDK for CrocoTiger API. It allows developers to easily integrate CrocoTiger's powerful semantic fence capabilities into their Python applications.
 
 ---
-## Usage [WIP - need to define the pypi package name]
+## Usage
 To use the CrocoTiger SDK, first install it via pip:
 
 ```bash
