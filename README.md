@@ -15,7 +15,7 @@ Then, you can import the SDK and start using it in your Python code:
 ```python
 from crocotiger.sdk import SDK
 
-client = SDK(base_path="http://localhost:8090/api/v1/")
+client = SDK(base_path="http://localhost:8000/api/v1/")
 project = client.get_project_client().find_one(1)
 print(project)
 ```
@@ -27,7 +27,6 @@ CrocoTiger offers a development edition docker image with sample projects for de
 1. Install docker
 2. Do `docker pull public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
 3. Do `docker run -d --name croco_tiger_container --gpus all -p 8000:8000 public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
-4. Replace `api_url` with `http://localhost:8000/api/v1/`
 
 
 ## How to use
