@@ -27,14 +27,6 @@ It allows developers to easily integrate CrocoTiger's powerful **semantic fence 
 
 ---
 
-## Installation
-
-To use the CrocoTiger SDK, first install it via pip:
-
-```bash
-pip install crocotiger-sdk
-```
-
 ## Download a sample docker image
 CrocoTiger offers a development edition docker image with sample projects for development and testing purposes.
 
@@ -42,6 +34,16 @@ CrocoTiger offers a development edition docker image with sample projects for de
 2. Do `docker pull public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
 3. Do `docker run -d --name croco_tiger_container --gpus all -p 8000:8000 public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
 4. Replace `api_url` with `http://localhost:8000/api/v1/`
+
+---
+
+## Installation
+
+To use the CrocoTiger SDK, first install it via pip:
+
+```bash
+pip install crocotiger-sdk
+```
 
 ## Quick Start
 
