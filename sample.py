@@ -1,4 +1,4 @@
-from crocotiger.sdk import SDK
+from crocotiger_sdk import SDK
 
 sdk = SDK()
 project = sdk.get_project_client().find_one(1)
