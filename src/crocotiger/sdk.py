@@ -6,9 +6,10 @@ from crocotiger.utils.rest import RestClient
 
 
 class SDK:
-    def __init__(self, base_path: str = "http://localhost:8090/api/v1/"):
+    def __init__(self, base_path: str = "http://localhost:8090/api/v1/", passphrase: str = "crocotiger_passphrase"):
         self.base_path = base_path
         self._rest_client = RestClient(base_path)
+        self._rest_client.authenticate(passphrase)
 
     def get_project_client(self) -> ProjectClient:
         return ProjectClient(self._rest_client)
