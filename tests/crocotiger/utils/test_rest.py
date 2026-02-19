@@ -79,6 +79,33 @@ def test_handle_response_api_error_not_json(mocker):
     assert excinfo.value.details == {"message": "Internal server error in plain text"}
 
 
+def test_authenticate_sets_authorization_header(mocker):
+    """Verifies authenticate POSTs to sign-in and injects the Bearer token in headers."""
+    client = RestClient("http://api.com")
+    mock_post = mocker.patch("requests.post")
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = {"data": {"token": "my-jwt-token"}}
+
+    client.authenticate("my-passphrase")
+
+    mock_post.assert_called_once_with(
+        "http://api.com/auth/sign-in",
+        headers=client.headers,
+        json={"passphrase": "my-passphrase"},
+    )
+    assert client.headers["Authorization"] == "Bearer my-jwt-token"
+
+
+def test_authenticate_raises_on_http_error(mocker):
+    """Verifies authenticate propagates the HTTP error when the server rejects the passphrase."""
+    client = RestClient("http://api.com")
+    mock_post = mocker.patch("requests.post")
+    mock_post.return_value.raise_for_status.side_effect = requests.HTTPError("401 Unauthorized")
+
+    with pytest.raises(requests.HTTPError):
+        client.authenticate("wrong-passphrase")
+
+
 def test_get(mocker):
     """Verifies the GET method calls requests.get with correct params."""
     client = RestClient("http://api.com")
