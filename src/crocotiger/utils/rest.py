@@ -15,7 +15,9 @@ class RestClient:
 
     def authenticate(self, passphrase: str) -> None:
         url = self._prepare_url("auth/sign-in")
-        response = requests.post(url, headers=self.headers, json={"passphrase": passphrase})
+        response = requests.post(
+            url, headers=self.headers, json={"passphrase": passphrase}
+        )
         response.raise_for_status()
         token = response.json()["data"]["token"]
         self.headers["Authorization"] = f"Bearer {token}"

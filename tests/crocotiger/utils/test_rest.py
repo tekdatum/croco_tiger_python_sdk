@@ -80,7 +80,7 @@ def test_handle_response_api_error_not_json(mocker):
 
 
 def test_authenticate_sets_authorization_header(mocker):
-    """Verifies authenticate POSTs to sign-in and injects the Bearer token in headers."""
+    """Verifies sign-in and puts the Bearer token in headers."""
     client = RestClient("http://api.com")
     mock_post = mocker.patch("requests.post")
     mock_post.return_value.status_code = 200
@@ -97,10 +97,12 @@ def test_authenticate_sets_authorization_header(mocker):
 
 
 def test_authenticate_raises_on_http_error(mocker):
-    """Verifies authenticate propagates the HTTP error when the server rejects the passphrase."""
+    """Verifies the HTTP error when the server rejects the passphrase."""
     client = RestClient("http://api.com")
     mock_post = mocker.patch("requests.post")
-    mock_post.return_value.raise_for_status.side_effect = requests.HTTPError("401 Unauthorized")
+    mock_post.return_value.raise_for_status.side_effect = requests.HTTPError(
+        "401 Unauthorized"
+    )
 
     with pytest.raises(requests.HTTPError):
         client.authenticate("wrong-passphrase")
