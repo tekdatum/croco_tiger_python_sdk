@@ -13,6 +13,9 @@ class RestClient:
             "Accept": "application/json",
         }
 
+    def add_authorization_token(self, token: str) -> None:
+        self.headers["Authorization"] = f"Bearer {token}"
+
     def _handle_response(self, response: requests.Response) -> Any:
         if 200 <= response.status_code < 300:
             json_response = response.json()

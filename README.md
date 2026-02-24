@@ -214,7 +214,18 @@ log_file = builder_client.find_project_log_by_name(MEDICARE_ID, "build_log_v1.tx
 * `find_project_testing_summary`
 * `find_project_validation_summary`
 
+---
 
+## Authentication & Passphrase Reset
+
+This API uses **JWT tokens**. To access protected endpoints, include the header `Authorization: Bearer <token>`. You can obtain a token by signing in at `/api/v1/auth/sign-in` using your passphrase.
+
+### Resetting the Passphrase
+If you forget your passphrase or need to set it for the first time:
+
+1. **Retrieve the reset token** by running the following command in your terminal:
+   ```bash
+   docker exec {your-container-name} cat /apps/engine_api/input/reset.txt
 
 ---
 

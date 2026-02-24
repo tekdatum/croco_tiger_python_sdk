@@ -79,6 +79,15 @@ def test_handle_response_api_error_not_json(mocker):
     assert excinfo.value.details == {"message": "Internal server error in plain text"}
 
 
+def test_add_authorization_token(mocker):
+    """Verifies add_authorization_token injects the Bearer header."""
+    client = RestClient("http://api.com")
+
+    client.add_authorization_token("my-jwt-token")
+
+    assert client.headers["Authorization"] == "Bearer my-jwt-token"
+
+
 def test_get(mocker):
     """Verifies the GET method calls requests.get with correct params."""
     client = RestClient("http://api.com")
