@@ -13,13 +13,7 @@ class RestClient:
             "Accept": "application/json",
         }
 
-    def authenticate(self, passphrase: str) -> None:
-        url = self._prepare_url("auth/sign-in")
-        response = requests.post(
-            url, headers=self.headers, json={"passphrase": passphrase}
-        )
-        response.raise_for_status()
-        token = response.json()["data"]["token"]
+    def add_authorization_token(self, token: str) -> None:
         self.headers["Authorization"] = f"Bearer {token}"
 
     def _handle_response(self, response: requests.Response) -> Any:
