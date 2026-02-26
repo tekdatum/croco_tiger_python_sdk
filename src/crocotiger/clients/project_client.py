@@ -27,7 +27,7 @@ class ProjectClient:
             "total_topic_questions": total_topic_questions,
             "zip": zip,
         }
-        data = self._rest_client.post(f"{self._endpoint}/create", data=payload)
+        data = self._rest_client.post(f"{self._endpoint}", data=payload)
         return Project(**data)
 
     def find_all(self, limit: int, offset: int) -> list[Project]:
@@ -54,16 +54,18 @@ class ProjectClient:
             "total_topic_questions": total_topic_questions,
             "zip": zip,
         }
-        data = self._rest_client.post(
-            f"{self._endpoint}/update/{project_id}", data=payload
-        )
+        data = self._rest_client.put(f"{self._endpoint}/{project_id}", data=payload)
         return Project(**data)
 
     def delete(self, project_id: int) -> None:
-        self._rest_client.post(f"{self._endpoint}/delete/{project_id}", data={})
+        self._rest_client.delete(f"{self._endpoint}/{project_id}")
 
     def find_one(self, project_id: int) -> Project:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}")
+        return Project(**data)
+
+    def find_one_by_name(self, name: str) -> Project:
+        data = self._rest_client.get(f"{self._endpoint}/one-by-name/{name}")
         return Project(**data)
 
     def upload_chained_zip(

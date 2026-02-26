@@ -33,7 +33,7 @@ CrocoTiger offers a development edition docker image with sample projects for de
 1. Install docker
 2. Do `docker pull public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
 3. Do `docker run -d --name croco_tiger_container --gpus all -p 8000:8000 public.ecr.aws/k9l9y2x7/tekdatum/croco-tiger-developer-edition:1.1`
-4. Replace `api_url` with `http://localhost:8000/api/v1/`
+4. Replace `base_path` with `http://localhost:8000/api/v1/`
 
 ---
 
@@ -47,13 +47,6 @@ pip install crocotiger-sdk
 
 ## Quick Start
 
-***Example project id's***
-```python
-MEDICARE_ID = 1
-TIME_OFF_ID = 2
-BANK_SUPPORT_ID = 3  
-```
-
 ### 1. Configuration
 
 You can initialize the SDK by passing your API URL directly.
@@ -61,7 +54,7 @@ You can initialize the SDK by passing your API URL directly.
 ```python
 from crocotiger_sdk.sdk import SDK
 
-client = SDK(api_url="<your_api_url>")
+client = SDK(base_path="<your_base_path>")
 ```
 
 ### 2. Basic Usage (Fence Validation)
@@ -69,21 +62,24 @@ client = SDK(api_url="<your_api_url>")
 The most common use case is validating text against a project's fence rules.
 
 ```python
-from crocotiger_sdk import SDK
+from crocotiger.sdk import SDK
+from crocotiger.demo.projects import Project
 
-client = SDK(api_url="http://localhost:8000/api/v1/")
-fence_client = client.get_fence_client()
+client = SDK(base_path="http://localhost:8000/api/v1")
+
+# Load the project
+project_client = client.get_project_client()
+project = project_client.find_one_by_name(Project.MEDICARE.value)
 
 # Validate text for a specific project (e.g., project_id=1)
-validation_result = fence_client.validate(
-    project_id=MEDICARE_ID, 
-    text="Text to validate"
-)
+fence_client = client.get_fence_client()
+validation_result = fence_client.validate(project_id=project.id, text="Text")
 
 if validation_result.valid:
     print("✅ Text is valid.")
 else:
     print(f"❌ Violation detected. Reason: {validation_result.reason_code}")
+
 
 ```
 
@@ -95,7 +91,7 @@ Here's a complete example showing how CrocoTiger's fence validation detects and 
 from crocotiger_sdk import SDK
 
 # Initialize the SDK
-client = SDK(api_url="http://localhost:8000/api/v1/")
+client = SDK(base_path="http://localhost:8000/api/v1/")
 fence_client = client.get_fence_client()
 
 # Example: Attempting a prompt injection attack
@@ -140,6 +136,7 @@ print(f"Project Name: {project.name}")
 | `create` | Create a new project. |
 | `find_all` | Retrieve all projects. This allows pagination using limit and offset parameters. |
 | `find_one` | Retrieve a single project by its ID. |
+| `find_one_by_name` | Retrieve a single project by its name. |
 | `update` | Update an existing project. |
 | `delete` | Delete a project by its ID. |
 | `upload_zip` | Upload a zip file for the project. |
