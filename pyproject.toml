@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crocotiger_sdk" # the project and lib name
-version = "0.1.6"
+version = "0.1.9"
 description = "CrocoTiger SDK"
 readme = "README.md"
 requires-python = ">=3.11"

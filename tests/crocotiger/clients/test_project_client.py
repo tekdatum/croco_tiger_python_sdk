@@ -55,7 +55,7 @@ def test_create(mock_rest_client, sample_project_data):
     result = client.create(**payload)
 
     assert isinstance(result, Project)
-    mock_rest_client.post.assert_called_once_with("/project/create", data=payload)
+    mock_rest_client.post.assert_called_once_with("/project", data=payload)
 
 
 def test_find_all(mock_rest_client, sample_project_data):
@@ -75,7 +75,7 @@ def test_find_all(mock_rest_client, sample_project_data):
 def test_update(mock_rest_client, sample_project_data):
     """Verifies update calls post with project_id in URL."""
     client = ProjectClient(mock_rest_client)
-    mock_rest_client.post.return_value = sample_project_data
+    mock_rest_client.put.return_value = sample_project_data
     payload = {
         "name": "New",
         "context": "Ctx",
@@ -88,7 +88,7 @@ def test_update(mock_rest_client, sample_project_data):
 
     result = client.update(project_id=99, **payload)
 
-    mock_rest_client.post.assert_called_once_with("/project/update/99", data=payload)
+    mock_rest_client.put.assert_called_once_with("/project/99", data=payload)
     assert result.id == 1
 
 
@@ -98,7 +98,7 @@ def test_delete(mock_rest_client):
 
     client.delete(project_id=123)
 
-    mock_rest_client.post.assert_called_once_with("/project/delete/123", data={})
+    mock_rest_client.delete.assert_called_once_with("/project/123")
 
 
 def test_find_one(mock_rest_client, sample_project_data):
@@ -130,3 +130,14 @@ def test_upload_chained_zip(mock_rest_client, tmp_path):
     assert result["name"] == "data.zip"
     assert isinstance(result["size"], int)
     assert result == api_response
+
+
+def test_find_one_by_name(mock_rest_client, sample_project_data):
+    """Verifies find_one_by_name calls get with the project_name."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.get.return_value = sample_project_data
+
+    result = client.find_one_by_name("my-project")
+
+    mock_rest_client.get.assert_called_once_with("/project/one-by-name/my-project")
+    assert isinstance(result, Project)

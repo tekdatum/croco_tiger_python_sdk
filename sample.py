@@ -1,15 +1,17 @@
 from crocotiger.sdk import SDK
+from crocotiger.demo.projects import Project
 
-sdk = SDK()
-project = sdk.get_project_client().find_one(1)
-print(project)
+client = SDK(base_path="http://localhost:8000/api/v1")
 
-custom_settings = sdk.get_custom_settings_client().find_custom_settings()
-print(custom_settings)
-custom_settings = sdk.get_custom_settings_client().update_custom_settings(
-    openai_key="sk-xxxx",
-    gemini_key="gemini-xxxx",
-)
-print(custom_settings)
-custom_settings = sdk.get_custom_settings_client().clear_llms_keys()
-print(custom_settings)
+# Load the project
+project_client = client.get_project_client()
+project = project_client.find_one_by_name(Project.MEDICARE.value)
+
+# Validate text for a specific project (e.g., project_id=1)
+fence_client = client.get_fence_client()
+validation_result = fence_client.validate(project_id=project.id, text="Text")
+
+if validation_result.valid:
+    print("✅ Text is valid.")
+else:
+    print(f"❌ Violation detected. Reason: {validation_result.reason_code}")
