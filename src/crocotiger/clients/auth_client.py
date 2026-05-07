@@ -12,10 +12,10 @@ class AuthClient:
         )
         return str(data["token"])
 
-    def reset_passphrase(self, reset_token: str, passphrase: str) -> None:
+    def reset_passphrase(self, reset_token: str, new_passphrase: str) -> None:
         self._rest_client.post(
             f"{self._endpoint}/reset",
-            data={"reset_token": reset_token, "passphrase": passphrase},
+            data={"reset_token": reset_token, "passphrase": new_passphrase},
         )
 
     def sign_out(self) -> None:
