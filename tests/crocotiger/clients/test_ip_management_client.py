@@ -94,7 +94,14 @@ def test_unblock_ip(mock_rest_client):
 
 def test_list_regions(mock_rest_client):
     client = IPManagementClient(mock_rest_client)
-    raw = [{"country": "China", "country_code": "CN", "request_count": 100, "is_blocked": True}]
+    raw = [
+        {
+            "country": "China",
+            "country_code": "CN",
+            "request_count": 100,
+            "is_blocked": True,
+        }
+    ]
     mock_rest_client.get.return_value = raw
 
     result = client.list_regions(PROJECT_ID)

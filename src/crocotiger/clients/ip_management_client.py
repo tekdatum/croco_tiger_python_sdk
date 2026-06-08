@@ -56,6 +56,4 @@ class IPManagementClient:
         return GeoBlock(**data)
 
     def delete_geo_block(self, project_id: int, entry_id: int) -> None:
-        self._rest_client.delete(
-            f"{self._endpoint}/{project_id}/geo-blocks/{entry_id}"
-        )
+        self._rest_client.delete(f"{self._endpoint}/{project_id}/geo-blocks/{entry_id}")
