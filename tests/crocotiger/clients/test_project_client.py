@@ -58,6 +58,46 @@ def test_create(mock_rest_client, sample_project_data):
     mock_rest_client.post.assert_called_once_with("/project", data=payload)
 
 
+def test_create_minimal(mock_rest_client, sample_project_data):
+    """Verifies create omits optional fields left as None from the payload."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.post.return_value = sample_project_data
+
+    result = client.create(name="New", context="Ctx", topic="T")
+
+    assert isinstance(result, Project)
+    mock_rest_client.post.assert_called_once_with(
+        "/project", data={"name": "New", "context": "Ctx", "topic": "T"}
+    )
+
+
+def test_create_with_config_fields(mock_rest_client, sample_project_data):
+    """Verifies create sends the new optional config fields when provided."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.post.return_value = sample_project_data
+
+    client.create(
+        name="New",
+        context="Ctx",
+        topic="T",
+        optimization_strategy="f_beta",
+        openai_llm="gpt-4o",
+        gemini_llm="gemini-2.0-flash",
+    )
+
+    mock_rest_client.post.assert_called_once_with(
+        "/project",
+        data={
+            "name": "New",
+            "context": "Ctx",
+            "topic": "T",
+            "optimization_strategy": "f_beta",
+            "openai_llm": "gpt-4o",
+            "gemini_llm": "gemini-2.0-flash",
+        },
+    )
+
+
 def test_find_all(mock_rest_client, sample_project_data):
     """Verifies find_all returns a list of Project objects."""
     client = ProjectClient(mock_rest_client)
@@ -90,6 +130,29 @@ def test_update(mock_rest_client, sample_project_data):
 
     mock_rest_client.put.assert_called_once_with("/project/99", data=payload)
     assert result.id == 1
+
+
+def test_update_partial(mock_rest_client, sample_project_data):
+    """Verifies update only sends the fields the caller provides."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_project_data
+
+    result = client.update(project_id=99, name="New")
+
+    mock_rest_client.put.assert_called_once_with("/project/99", data={"name": "New"})
+    assert result.id == 1
+
+
+def test_update_status(mock_rest_client, sample_project_data):
+    """Verifies update can send the new status field on its own."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_project_data
+
+    client.update(project_id=99, status="archived")
+
+    mock_rest_client.put.assert_called_once_with(
+        "/project/99", data={"status": "archived"}
+    )
 
 
 def test_delete(mock_rest_client):
