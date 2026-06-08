@@ -59,7 +59,7 @@ class TestProject:
             created_at=datetime.now(),
         )
 
-        assert project.optimization_strategy == OptimizationStrategy.WEIGHTED_AVERAGE
+        assert project.optimization_strategy == OptimizationStrategy.BALANCED
         assert project.openai_llm is None
         assert project.gemini_llm is None
         assert project.can_quick_rebuild is False
@@ -101,7 +101,7 @@ class TestProject:
             latest_build=build_data,
         )
 
-        assert project.optimization_strategy == OptimizationStrategy.F_BETA
+        assert project.optimization_strategy == OptimizationStrategy.BROAD
         assert project.openai_llm == "gpt-4o"
         assert project.can_quick_rebuild is True
         assert isinstance(project.active_build, ProjectBuild)
