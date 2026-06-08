@@ -6,6 +6,11 @@ on:
       - 'feature/**'
       - 'bugfix/**'
 
+permissions:
+  contents: read # actions/checkout
+  checks: write # publish-unit-test-result-action: create check run with test results
+  pull-requests: write # publish-unit-test-result-action: post test results as PR comment
+
 jobs:
   qa_and_test:
     runs-on: ubuntu-latest
