@@ -26,6 +26,6 @@ class ProjectBuild(BaseModel):
     url: str | None = None
     zip: str | None = None
     total_topic_questions: int
-    optimization_strategy: OptimizationStrategy = OptimizationStrategy.WEIGHTED_AVERAGE
+    optimization_strategy: OptimizationStrategy = OptimizationStrategy.BALANCED
     openai_llm: str | None = None
     gemini_llm: str | None = None

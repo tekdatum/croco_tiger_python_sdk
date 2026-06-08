@@ -26,14 +26,14 @@ class TestProjectBuild:
             context="A test context",
             restricted_topics=["NSFW"],
             total_topic_questions=5000,
-            optimization_strategy=OptimizationStrategy.CONSTRAINED,
+            optimization_strategy=OptimizationStrategy.STRICT,
             openai_llm="gpt-4o",
         )
 
         assert build.build_number == 2
         assert build.is_active is True
         assert build.notes == "Tuned thresholds"
-        assert build.optimization_strategy == OptimizationStrategy.CONSTRAINED
+        assert build.optimization_strategy == OptimizationStrategy.STRICT
 
     def test_defaults(self) -> None:
         build = ProjectBuild(
@@ -55,7 +55,7 @@ class TestProjectBuild:
         assert build.restricted_topics == []
         assert build.url is None
         assert build.zip is None
-        assert build.optimization_strategy == OptimizationStrategy.WEIGHTED_AVERAGE
+        assert build.optimization_strategy == OptimizationStrategy.BALANCED
         assert build.openai_llm is None
         assert build.gemini_llm is None
 
