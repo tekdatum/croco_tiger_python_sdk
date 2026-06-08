@@ -26,7 +26,7 @@ class Project(BaseModel):
     updated_at: datetime | None = None
     build_started_at: datetime | None = None
     build_finished_at: datetime | None = None
-    optimization_strategy: OptimizationStrategy
+    optimization_strategy: OptimizationStrategy = OptimizationStrategy.BALANCED
     openai_llm: str | None = None
     gemini_llm: str | None = None
     can_quick_rebuild: bool = False
