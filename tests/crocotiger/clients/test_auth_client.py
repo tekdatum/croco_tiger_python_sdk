@@ -30,12 +30,22 @@ def test_authenticate_returns_token(mock_rest_client):
 
 
 def test_reset_passphrase(mock_rest_client):
-    """Verifies reset_passphrase POSTs old and new passphrases to the endpoint."""
+    """Verifies reset_passphrase POSTs the reset token and new passphrase."""
     client = AuthClient(mock_rest_client)
 
-    client.reset_passphrase("old-pass", "new-pass")
+    client.reset_passphrase("reset-token-abc", "new-pass")
 
     mock_rest_client.post.assert_called_once_with(
-        "/auth/reset-passphrase",
-        data={"old_passphrase": "old-pass", "new_passphrase": "new-pass"},
+        "/auth/reset",
+        data={"reset_token": "reset-token-abc", "passphrase": "new-pass"},
     )
+
+
+def test_sign_out(mock_rest_client):
+    """Verifies sign_out POSTs to sign-out and clears the auth token."""
+    client = AuthClient(mock_rest_client)
+
+    client.sign_out()
+
+    mock_rest_client.post.assert_called_once_with("/auth/sign-out", data={})
+    mock_rest_client.remove_authorization_token.assert_called_once_with()

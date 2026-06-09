@@ -88,6 +88,25 @@ def test_add_authorization_token(mocker):
     assert client.headers["Authorization"] == "Bearer my-jwt-token"
 
 
+def test_remove_authorization_token():
+    """Verifies remove_authorization_token strips the Bearer header."""
+    client = RestClient("http://api.com")
+    client.add_authorization_token("my-jwt-token")
+
+    client.remove_authorization_token()
+
+    assert "Authorization" not in client.headers
+
+
+def test_remove_authorization_token_when_absent_is_noop():
+    """Verifies remove_authorization_token is safe when no token was set."""
+    client = RestClient("http://api.com")
+
+    client.remove_authorization_token()
+
+    assert "Authorization" not in client.headers
+
+
 def test_get(mocker):
     """Verifies the GET method calls requests.get with correct params."""
     client = RestClient("http://api.com")
