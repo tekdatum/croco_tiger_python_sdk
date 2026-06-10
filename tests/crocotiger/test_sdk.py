@@ -98,3 +98,15 @@ class TestSDK:
         # Assert
         mock_client_class.assert_called_once_with(sdk._rest_client)
         assert client == mock_client_class.return_value
+
+    def test_get_llm_models_client(self, mock_rest, mocker) -> None:
+        # Arrange
+        mock_client_class = mocker.patch("crocotiger.sdk.LLMModelsClient")
+        sdk = SDK()
+
+        # Act
+        client = sdk.get_llm_models_client()
+
+        # Assert
+        mock_client_class.assert_called_once_with(sdk._rest_client)
+        assert client == mock_client_class.return_value
