@@ -46,7 +46,7 @@ class RestClient:
                 raise ApiErrorResponse.from_response(response)
             except ValueError:
                 response.raise_for_status()
-        return response.content  # type: ignore[no-any-return]
+        return response.content
 
     def post(self, endpoint: str, data: Dict[str, Any]) -> Any:
         url = self._prepare_url(endpoint)

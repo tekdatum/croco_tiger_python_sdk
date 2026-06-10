@@ -8,7 +8,7 @@ version = "1.2.1"
 description = "CrocoTiger SDK"
 readme = "README.md"
 requires-python = ">=3.11"
-optional-dependencies = { test = ["pytest", "pytest-mock"] }
+optional-dependencies = { test = ["pytest", "pytest-mock", "types-requests"] }
 authors = [{ name="Tekdatum", email="tools@tekdatum.com" }]
 license = "Apache-2.0"
 classifiers = [
