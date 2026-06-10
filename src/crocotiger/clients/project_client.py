@@ -1,5 +1,6 @@
 from typing import Any
 from crocotiger.models.project import Project
+from crocotiger.models.project_build import ProjectBuild
 from crocotiger.utils.rest import RestClient
 
 
@@ -90,6 +91,31 @@ class ProjectClient:
     def find_one_by_name(self, name: str) -> Project:
         data = self._rest_client.get(f"{self._endpoint}/one-by-name/{name}")
         return Project(**data)
+
+    def find_builds(self, project_id: int) -> list[ProjectBuild]:
+        data = self._rest_client.get(f"{self._endpoint}/{project_id}/builds")
+        return [ProjectBuild(**item) for item in data]
+
+    def find_build(self, project_id: int, build_id: int) -> ProjectBuild:
+        data = self._rest_client.get(f"{self._endpoint}/{project_id}/builds/{build_id}")
+        return ProjectBuild(**data)
+
+    def activate_build(self, project_id: int, build_id: int) -> ProjectBuild:
+        data = self._rest_client.put(
+            f"{self._endpoint}/{project_id}/builds/{build_id}/activate", data={}
+        )
+        return ProjectBuild(**data)
+
+    def update_build_notes(
+        self, project_id: int, build_id: int, notes: str | None
+    ) -> ProjectBuild:
+        """Set or clear a build's notes. Unlike the project partial-update,
+        `notes` is always sent: passing None clears it server-side."""
+        data = self._rest_client.put(
+            f"{self._endpoint}/{project_id}/builds/{build_id}/notes",
+            data={"notes": notes},
+        )
+        return ProjectBuild(**data)
 
     def upload_chained_zip(
         self, project_id: int, file_path: str, rewrite: bool = False
