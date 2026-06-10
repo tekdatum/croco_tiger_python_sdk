@@ -22,6 +22,8 @@ class RestClient:
     def _handle_response(self, response: requests.Response) -> Any:
         if 200 <= response.status_code < 300:
             json_response = response.json()
+            if json_response is None:
+                return None
             return json_response["data"] if "data" in json_response else json_response
         try:
             raise ApiErrorResponse.from_response(response)
@@ -39,7 +41,12 @@ class RestClient:
     def get_file(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> bytes:
         url = self._prepare_url(endpoint)
         response = requests.get(url, headers=self.headers, params=params)
-        return response.content
+        if not (200 <= response.status_code < 300):
+            try:
+                raise ApiErrorResponse.from_response(response)
+            except ValueError:
+                response.raise_for_status()
+        return response.content  # type: ignore[no-any-return]
 
     def post(self, endpoint: str, data: Dict[str, Any]) -> Any:
         url = self._prepare_url(endpoint)
@@ -52,9 +59,8 @@ class RestClient:
         url = self._prepare_url(endpoint)
         with open(file_path, "rb") as f:
             files = {"file": f}
-            response = requests.post(
-                url, headers={"Accept": "application/json"}, files=files, params=params
-            )
+            headers = {k: v for k, v in self.headers.items() if k != "Content-Type"}
+            response = requests.post(url, headers=headers, files=files, params=params)
         return self._handle_response(response)
 
     def put(self, endpoint: str, data: Dict[str, Any]) -> Any:

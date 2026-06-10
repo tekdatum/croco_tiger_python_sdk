@@ -60,21 +60,19 @@ class BuilderClient:
 
     def find_project_accept_list(
         self, project_id: int, build_id: int | None = None
-    ) -> dict[str, Any]:
-        data = self._rest_client.get(
+    ) -> Any:
+        return self._rest_client.get(
             f"{self.base_path}/generated/{project_id}/accept_list",
             params=self._build_id_params(build_id),
         )
-        return dict(data)
 
     def find_project_reject_list(
         self, project_id: int, build_id: int | None = None
-    ) -> dict[str, Any]:
-        data = self._rest_client.get(
+    ) -> Any:
+        return self._rest_client.get(
             f"{self.base_path}/generated/{project_id}/reject_list",
             params=self._build_id_params(build_id),
         )
-        return dict(data)
 
     def find_project_testing_metrics(
         self, project_id: int, build_id: int | None = None
