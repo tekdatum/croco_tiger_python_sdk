@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from crocotiger.models.fence_event import FenceEvent, FenceEventPage
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from crocotiger.models.fence_event import FenceEventPage
 from crocotiger.models.fence_validation import FenceValidation
@@ -25,7 +25,7 @@ class FenceClient:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
     ) -> FenceEventPage:
-        params = {"limit": limit, "offset": offset}
+        params: Dict[str, Any] = {"limit": limit, "offset": offset}
         if start_date is not None:
             params["start_date"] = start_date.isoformat()
         if end_date is not None:
