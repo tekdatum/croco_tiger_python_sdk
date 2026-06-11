@@ -189,7 +189,7 @@ current_settings = settings_client.find_custom_settings()
 
 The Builder Client allows you to trigger builds and retrieve generated data (accept/reject lists, logs, and metrics).
 
-**1. Trigger a Build**
+**1. Trigger a Full Build**
 
 ```python
 # Load the project
@@ -200,7 +200,22 @@ builder_client = client.get_builder_client()
 builder_client.build(project_id=project.id)
 ```
 
-**2. Retrieve Generated Data**
+**2. Trigger a Quick Rebuild**
+
+A quick rebuild re-runs only the benchmark phase against an already-trained model, skipping dataset generation and training entirely. Use it when you want refreshed metrics and thresholds without retraining.
+
+```python
+# Check eligibility first
+project = project_client.find_one(project_id=42)
+
+if project.can_quick_rebuild:
+    builder_client = client.get_builder_client()
+    builder_client.quick_build(project_id=project.id, notes="Refreshed after threshold adjustment")
+```
+
+Poll `project_client.find_one(project_id)` and check `project.status` until it is `DONE` or `FAILED`.
+
+**3. Retrieve Generated Data**
 The client offers specific methods to find lists, logs, and metrics by project ID.
 
 ```python
@@ -213,6 +228,11 @@ log_file = builder_client.find_project_log_by_name(project.id, "build_log_v1.txt
 ```
 
 **Available methods**:
+
+* **Build Triggers:**
+* `build` — full build (dataset generation + training + benchmarks)
+* `quick_build` — benchmark-only rebuild; requires `project.can_quick_rebuild == True`
+
 
 * **List Retrieval:**
 * `find_project_accept_list`
