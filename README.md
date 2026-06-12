@@ -140,7 +140,7 @@ result = fence_client.validate(project_id=project.id, text="Some user input")
 
 ### Project Client
 
-To interact with projects, use the `ProjectClient`. It allows you to create, find, update, and delete projects.
+To interact with projects, use the `ProjectClient`. It lets you create, find, update, and delete projects, and manage their **builds** (versions).
 
 ```python
 # Load the project
@@ -153,13 +153,33 @@ print(f"Project Name: {project.name}")
 **Available methods**:
 | Method | Description |
 | :--- | :--- |
-| `create` | Create a new project. |
+| `create` | Create a new project. Accepts build-config fields (`optimization_strategy`, `openai_llm`, `gemini_llm`, …). |
 | `find_all` | Retrieve projects with pagination. Requires `limit` and `offset` parameters. |
 | `find_one` | Retrieve a single project by its ID. |
 | `find_one_by_name` | Retrieve a single project by its name. |
-| `update` | Update an existing project. |
+| `update` | Partially update a project; only the fields you pass are sent (others are left unchanged). |
 | `delete` | Delete a project by its ID. |
 | `upload_chained_zip` | Upload a chained zip file for the project (set `rewrite=True` to overwrite). |
+| `find_builds` | List all builds for a project. |
+| `find_build` | Retrieve a single build by its ID. |
+| `activate_build` | Make a specific build the project's active build. |
+| `update_build_notes` | Set, or clear (pass `None`), the notes on a build. |
+
+#### Build management
+
+A project owns a sequence of immutable **builds** (versions); exactly one build is *active*, and config edits land on a draft build.
+
+```python
+# List builds and read one back
+builds = project_client.find_builds(project.id)
+build = project_client.find_build(project.id, builds[0].id)
+
+# Promote a previous build to active
+project_client.activate_build(project.id, build.id)
+
+# Annotate a build (pass None to clear the note)
+project_client.update_build_notes(project.id, build.id, "production candidate")
+```
 
 ### Custom Settings Client
 
@@ -185,6 +205,23 @@ current_settings = settings_client.find_custom_settings()
 * `clear_llms_keys`: Clear all LLM API keys.
 * `find_custom_settings`: Retrieve the current configuration.
 
+### LLM Models Client
+
+The `LLMModelsClient` exposes the catalog of LLM models you can select as a project's `openai_llm` / `gemini_llm` build-config values.
+
+```python
+llm_models_client = client.get_llm_models_client()
+catalog = llm_models_client.find_llm_models()
+
+for model in catalog.openai:
+    print(f"{model.model} — {model.label} (recommended={model.recommended})")
+```
+
+**Available methods**:
+
+* `find_llm_models`: Retrieve the catalog of selectable OpenAI and Gemini models.
+* `refresh_llm_models`: Re-fetch the catalog from the upstream source.
+
 ### Builder Client
 
 The Builder Client allows you to trigger builds and retrieve generated data (accept/reject lists, logs, and metrics).
@@ -199,6 +236,8 @@ project = project_client.find_one_by_name(Project.TIME_OFF.value)
 builder_client = client.get_builder_client()
 builder_client.build(project_id=project.id)
 ```
+
+> An empty `build()` rebuilds the project's current config. Pass any config field (e.g. `optimization_strategy`, `openai_llm`, `gemini_llm`) or `notes` to override the draft before building.
 
 **2. Trigger a Quick Rebuild**
 
@@ -216,12 +255,15 @@ if project.can_quick_rebuild:
 Poll `project_client.find_one(project_id)` and check `project.status` until it is `DONE` or `FAILED`.
 
 **3. Retrieve Generated Data**
-The client offers specific methods to find lists, logs, and metrics by project ID.
+The client offers specific methods to find lists, logs, and metrics by project ID. Every artifact-retrieval method also accepts an optional `build_id` to target a specific build; when omitted, the project's **active** build is used.
 
 ```python
-# Get lists
+# Get lists (active build)
 accept_list = builder_client.find_project_accept_list(project.id)
 reject_list = builder_client.find_project_reject_list(project.id)
+
+# Target a specific build by its id
+accept_list_v2 = builder_client.find_project_accept_list(project.id, build_id=2)
 
 # Get specific files
 log_file = builder_client.find_project_log_by_name(project.id, "build_log_v1.txt")
