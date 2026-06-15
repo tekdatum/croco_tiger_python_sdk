@@ -19,10 +19,10 @@ class RestClient:
     def remove_authorization_token(self) -> None:
         self.headers.pop("Authorization", None)
 
-    def _handle_response(self, response: requests.Response) -> Any:
+    def _handle_response(self, response: requests.Response, *, extract_data: bool = True) -> Any:
         if 200 <= response.status_code < 300:
             json_response = response.json()
-            return json_response["data"] if "data" in json_response else json_response
+            return json_response["data"] if extract_data and "data" in json_response else json_response
         try:
             raise ApiErrorResponse.from_response(response)
         except ValueError:
@@ -34,12 +34,7 @@ class RestClient:
     def get_paged(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Any:
         url = self._prepare_url(endpoint)
         response = requests.get(url, headers=self.headers, params=params)
-        if 200 <= response.status_code < 300:
-            return response.json()
-        try:
-            raise ApiErrorResponse.from_response(response)
-        except ValueError:
-            response.raise_for_status()
+        return self._handle_response(response, extract_data=False)
 
     def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Any:
         url = self._prepare_url(endpoint)
