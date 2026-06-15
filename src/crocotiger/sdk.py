@@ -5,6 +5,7 @@ from crocotiger.clients.builder_client import BuilderClient
 from crocotiger.clients.custom_settings_client import CustomSettingsClient
 from crocotiger.clients.fence_client import FenceClient
 from crocotiger.clients.llm_models_client import LLMModelsClient
+from crocotiger.clients.ip_management_client import IPManagementClient
 from crocotiger.clients.project_client import ProjectClient
 from crocotiger.utils.rest import RestClient
 
@@ -41,3 +42,6 @@ class SDK:
 
     def get_llm_models_client(self) -> LLMModelsClient:
         return LLMModelsClient(self._rest_client)
+
+    def get_ip_management_client(self) -> IPManagementClient:
+        return IPManagementClient(self._rest_client)
