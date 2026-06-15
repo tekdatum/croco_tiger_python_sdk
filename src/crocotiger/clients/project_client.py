@@ -1,5 +1,6 @@
 from typing import Any
 from crocotiger.models.project import Project
+from crocotiger.models.project_build import ProjectBuild
 from crocotiger.utils.rest import RestClient
 
 
@@ -13,20 +14,31 @@ class ProjectClient:
         name: str,
         context: str,
         topic: str,
-        restricted_topics: list[str],
-        url: str,
-        total_topic_questions: int,
-        zip: str = "",
+        restricted_topics: list[str] | None = None,
+        url: str | None = None,
+        total_topic_questions: int | None = None,
+        zip: str | None = None,
+        optimization_strategy: str | None = None,
+        openai_llm: str | None = None,
+        gemini_llm: str | None = None,
     ) -> Project:
-        payload = {
+        """Create a project. Optional fields left as None are omitted from the
+        payload, so the server-side defaults apply."""
+        payload: dict[str, Any] = {
             "name": name,
             "context": context,
             "topic": topic,
+        }
+        optional: dict[str, Any] = {
             "restricted_topics": restricted_topics,
             "url": url,
             "total_topic_questions": total_topic_questions,
             "zip": zip,
+            "optimization_strategy": optimization_strategy,
+            "openai_llm": openai_llm,
+            "gemini_llm": gemini_llm,
         }
+        payload.update({k: v for k, v in optional.items() if v is not None})
         data = self._rest_client.post(f"{self._endpoint}", data=payload)
         return Project(**data)
 
@@ -37,23 +49,35 @@ class ProjectClient:
     def update(
         self,
         project_id: int,
-        name: str,
-        context: str,
-        topic: str,
-        restricted_topics: list[str],
-        url: str,
-        total_topic_questions: int,
-        zip: str = "",
+        name: str | None = None,
+        status: str | None = None,
+        context: str | None = None,
+        topic: str | None = None,
+        restricted_topics: list[str] | None = None,
+        url: str | None = None,
+        zip: str | None = None,
+        total_topic_questions: int | None = None,
+        optimization_strategy: str | None = None,
+        openai_llm: str | None = None,
+        gemini_llm: str | None = None,
     ) -> Project:
-        payload = {
+        """Partially update a project. Fields left as None are omitted from the
+        payload and remain unchanged server-side (clearing a nullable field by
+        sending an explicit null is not supported)."""
+        candidate: dict[str, Any] = {
             "name": name,
+            "status": status,
             "context": context,
             "topic": topic,
             "restricted_topics": restricted_topics,
             "url": url,
-            "total_topic_questions": total_topic_questions,
             "zip": zip,
+            "total_topic_questions": total_topic_questions,
+            "optimization_strategy": optimization_strategy,
+            "openai_llm": openai_llm,
+            "gemini_llm": gemini_llm,
         }
+        payload = {k: v for k, v in candidate.items() if v is not None}
         data = self._rest_client.put(f"{self._endpoint}/{project_id}", data=payload)
         return Project(**data)
 
@@ -67,6 +91,31 @@ class ProjectClient:
     def find_one_by_name(self, name: str) -> Project:
         data = self._rest_client.get(f"{self._endpoint}/one-by-name/{name}")
         return Project(**data)
+
+    def find_builds(self, project_id: int) -> list[ProjectBuild]:
+        data = self._rest_client.get(f"{self._endpoint}/{project_id}/builds")
+        return [ProjectBuild(**item) for item in data]
+
+    def find_build(self, project_id: int, build_id: int) -> ProjectBuild:
+        data = self._rest_client.get(f"{self._endpoint}/{project_id}/builds/{build_id}")
+        return ProjectBuild(**data)
+
+    def activate_build(self, project_id: int, build_id: int) -> ProjectBuild:
+        data = self._rest_client.put(
+            f"{self._endpoint}/{project_id}/builds/{build_id}/activate", data={}
+        )
+        return ProjectBuild(**data)
+
+    def update_build_notes(
+        self, project_id: int, build_id: int, notes: str | None
+    ) -> ProjectBuild:
+        """Set or clear a build's notes. Unlike the project partial-update,
+        `notes` is always sent: passing None clears it server-side."""
+        data = self._rest_client.put(
+            f"{self._endpoint}/{project_id}/builds/{build_id}/notes",
+            data={"notes": notes},
+        )
+        return ProjectBuild(**data)
 
     def upload_chained_zip(
         self, project_id: int, file_path: str, rewrite: bool = False

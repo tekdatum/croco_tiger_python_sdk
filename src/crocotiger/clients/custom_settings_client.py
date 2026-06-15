@@ -16,13 +16,18 @@ class CustomSettingsClient:
         openai_key: str | None = None,
         gemini_key: str | None = None,
     ) -> CustomSettings:
-        payload = {
+        """Set one or more keys. Keys left as None are omitted from the payload
+        and remain unchanged server-side; at least one key must be provided."""
+        candidate = {
             "openai_key": openai_key,
             "gemini_key": gemini_key,
         }
+        payload = {k: v for k, v in candidate.items() if v is not None}
         data = self._rest_client.put(f"{self.base_path}", data=payload)
         return CustomSettings(**data)
 
-    def clear_llms_keys(self) -> CustomSettings:
+    def clear_llms_keys(self) -> CustomSettings | None:
         data = self._rest_client.put(f"{self.base_path}/clear-keys", data={})
+        if data is None:
+            return None
         return CustomSettings(**data)

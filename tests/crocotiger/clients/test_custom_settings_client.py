@@ -46,17 +46,18 @@ def test_find_custom_settings(mock_rest_client, sample_settings_data):
 
 
 def test_update_custom_settings(mock_rest_client, sample_settings_data):
-    """Verifies update_custom_settings calls put with payload and returns the model."""
+    """Verifies update_custom_settings only sends the provided keys."""
     # Arrange
     client = CustomSettingsClient(mock_rest_client)
     mock_rest_client.put.return_value = sample_settings_data
-    payload = {"openai_key": "new-key", "gemini_key": None}
 
     # Act
     result = client.update_custom_settings(openai_key="new-key", gemini_key=None)
 
-    # Assert
-    mock_rest_client.put.assert_called_once_with("/custom-settings", data=payload)
+    # Assert: gemini_key is None, so it is omitted from the payload
+    mock_rest_client.put.assert_called_once_with(
+        "/custom-settings", data={"openai_key": "new-key"}
+    )
     assert isinstance(result, CustomSettings)
     assert result.openai_key == "sk-123"  # Value from sample_settings_data
 
@@ -79,3 +80,17 @@ def test_clear_llms_keys(mock_rest_client, sample_settings_data):
     assert isinstance(result, CustomSettings)
     assert result.openai_key is None
     assert result.gemini_key is None
+
+
+def test_clear_llms_keys_returns_none_when_no_settings(mock_rest_client):
+    """Verifies clear_llms_keys returns None when the server responds with null data."""
+    # Arrange
+    client = CustomSettingsClient(mock_rest_client)
+    mock_rest_client.put.return_value = None
+
+    # Act
+    result = client.clear_llms_keys()
+
+    # Assert
+    mock_rest_client.put.assert_called_once_with("/custom-settings/clear-keys", data={})
+    assert result is None

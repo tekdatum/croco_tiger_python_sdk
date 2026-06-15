@@ -6,6 +6,7 @@ from crocotiger.clients.project_client import ProjectClient
 from crocotiger.enums.build_step import BuildStep
 from crocotiger.enums.project_status import ProjectStatus
 from crocotiger.models.project import Project
+from crocotiger.models.project_build import ProjectBuild
 
 
 @pytest.fixture
@@ -29,6 +30,26 @@ def sample_project_data():
         "accept_threshold": 0.8,
         "reject_threshold": 0.2,
         "created_at": datetime.now(),
+    }
+
+
+@pytest.fixture
+def sample_build_data():
+    """Returns a valid dictionary to satisfy ProjectBuild model validation."""
+    return {
+        "id": 7,
+        "project_id": 1,
+        "build_number": 3,
+        "status": ProjectStatus.DONE,
+        "last_build_step": BuildStep.DONE,
+        "accept_threshold": 0.8,
+        "reject_threshold": 0.2,
+        "is_active": True,
+        "created_at": datetime.now(),
+        "topic": "AI",
+        "context": "Context",
+        "restricted_topics": [],
+        "total_topic_questions": 5,
     }
 
 
@@ -56,6 +77,46 @@ def test_create(mock_rest_client, sample_project_data):
 
     assert isinstance(result, Project)
     mock_rest_client.post.assert_called_once_with("/project", data=payload)
+
+
+def test_create_minimal(mock_rest_client, sample_project_data):
+    """Verifies create omits optional fields left as None from the payload."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.post.return_value = sample_project_data
+
+    result = client.create(name="New", context="Ctx", topic="T")
+
+    assert isinstance(result, Project)
+    mock_rest_client.post.assert_called_once_with(
+        "/project", data={"name": "New", "context": "Ctx", "topic": "T"}
+    )
+
+
+def test_create_with_config_fields(mock_rest_client, sample_project_data):
+    """Verifies create sends the new optional config fields when provided."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.post.return_value = sample_project_data
+
+    client.create(
+        name="New",
+        context="Ctx",
+        topic="T",
+        optimization_strategy="f_beta",
+        openai_llm="gpt-4o",
+        gemini_llm="gemini-2.0-flash",
+    )
+
+    mock_rest_client.post.assert_called_once_with(
+        "/project",
+        data={
+            "name": "New",
+            "context": "Ctx",
+            "topic": "T",
+            "optimization_strategy": "f_beta",
+            "openai_llm": "gpt-4o",
+            "gemini_llm": "gemini-2.0-flash",
+        },
+    )
 
 
 def test_find_all(mock_rest_client, sample_project_data):
@@ -90,6 +151,29 @@ def test_update(mock_rest_client, sample_project_data):
 
     mock_rest_client.put.assert_called_once_with("/project/99", data=payload)
     assert result.id == 1
+
+
+def test_update_partial(mock_rest_client, sample_project_data):
+    """Verifies update only sends the fields the caller provides."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_project_data
+
+    result = client.update(project_id=99, name="New")
+
+    mock_rest_client.put.assert_called_once_with("/project/99", data={"name": "New"})
+    assert result.id == 1
+
+
+def test_update_status(mock_rest_client, sample_project_data):
+    """Verifies update can send the new status field on its own."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_project_data
+
+    client.update(project_id=99, status="archived")
+
+    mock_rest_client.put.assert_called_once_with(
+        "/project/99", data={"status": "archived"}
+    )
 
 
 def test_delete(mock_rest_client):
@@ -141,3 +225,65 @@ def test_find_one_by_name(mock_rest_client, sample_project_data):
 
     mock_rest_client.get.assert_called_once_with("/project/one-by-name/my-project")
     assert isinstance(result, Project)
+
+
+def test_find_builds(mock_rest_client, sample_build_data):
+    """Verifies find_builds returns a list of ProjectBuild objects."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.get.return_value = [sample_build_data, sample_build_data]
+
+    result = client.find_builds(1)
+
+    mock_rest_client.get.assert_called_once_with("/project/1/builds")
+    assert len(result) == 2
+    assert all(isinstance(build, ProjectBuild) for build in result)
+
+
+def test_find_build(mock_rest_client, sample_build_data):
+    """Verifies find_build returns a single ProjectBuild for the build_id."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.get.return_value = sample_build_data
+
+    result = client.find_build(1, 7)
+
+    mock_rest_client.get.assert_called_once_with("/project/1/builds/7")
+    assert isinstance(result, ProjectBuild)
+    assert result.id == 7
+
+
+def test_activate_build(mock_rest_client, sample_build_data):
+    """Verifies activate_build puts to the activate endpoint with an empty body."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_build_data
+
+    result = client.activate_build(1, 7)
+
+    mock_rest_client.put.assert_called_once_with(
+        "/project/1/builds/7/activate", data={}
+    )
+    assert isinstance(result, ProjectBuild)
+
+
+def test_update_build_notes(mock_rest_client, sample_build_data):
+    """Verifies update_build_notes puts the notes payload."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_build_data
+
+    result = client.update_build_notes(1, 7, "v3 notes")
+
+    mock_rest_client.put.assert_called_once_with(
+        "/project/1/builds/7/notes", data={"notes": "v3 notes"}
+    )
+    assert isinstance(result, ProjectBuild)
+
+
+def test_update_build_notes_clear(mock_rest_client, sample_build_data):
+    """Verifies update_build_notes sends an explicit null to clear the notes."""
+    client = ProjectClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_build_data
+
+    client.update_build_notes(1, 7, None)
+
+    mock_rest_client.put.assert_called_once_with(
+        "/project/1/builds/7/notes", data={"notes": None}
+    )
