@@ -29,9 +29,9 @@ class IPManagementClient:
     def unblock_ip(self, project_id: int, ip_address: str) -> None:
         self._rest_client.delete(f"{self._endpoint}/{project_id}/block/{ip_address}")
 
-    def list_regions(self, project_id: int) -> list[dict[str, Any]]:
+    def list_regions(self, project_id: int) -> dict[str, Any]:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}/regions")
-        return list(data)
+        return dict(data)
 
     def list_geo_blocks(self, project_id: int) -> list[GeoBlock]:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}/geo-blocks")
