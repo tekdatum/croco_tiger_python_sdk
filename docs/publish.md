@@ -25,7 +25,7 @@ Edit the `pyproject.toml` file and update the `version` field under the `[projec
 
 ```toml
 [project]
-name = "combinatorics_utils"
+name = "crocotiger_sdk"
 version = "0.0.3"  <-- Update this
 ...
 ```

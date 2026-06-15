@@ -52,9 +52,9 @@ pip install crocotiger-sdk
 You can initialize the SDK by passing your API URL directly.
 
 ```python
-from crocotiger_sdk.sdk import SDK
+from crocotiger.sdk import SDK
 
-client = SDK(base_path="<your_base_path>")
+client = SDK(base_path="<your_base_path>", passphrase="<your_passphrase>")
 ```
 
 ### 2. Basic Usage (Fence Validation)
@@ -65,11 +65,11 @@ The most common use case is validating text against a project's fence rules.
 from crocotiger.sdk import SDK
 from crocotiger.demo.projects import Project
 
-client = SDK(base_path="http://localhost:8000/api/v1")
+client = SDK(base_path="http://localhost:8000/api/v1", passphrase="<your_passphrase>")
 
 # Load the project
 project_client = client.get_project_client()
-project = project_client.find_one_by_name(Project.MEDICARE.value)
+project = project_client.find_one_by_name(Project.TIME_OFF.value)
 
 # Validate text for a specific project (e.g., project_id=1)
 fence_client = client.get_fence_client()
@@ -88,15 +88,16 @@ else:
 Here's a complete example showing how CrocoTiger's fence validation detects and rejects common LLM attacks:
 
 ```python
-from crocotiger_sdk import SDK
+from crocotiger.sdk import SDK
+from crocotiger.demo.projects import Project
 
 # Initialize the SDK
-client = SDK(base_path="http://localhost:8000/api/v1/")
+client = SDK(base_path="http://localhost:8000/api/v1/", passphrase="<your_passphrase>")
 fence_client = client.get_fence_client()
 
 # Load the project
 project_client = client.get_project_client()
-project = project_client.find_one_by_name(Project.MEDICARE.value)
+project = project_client.find_one_by_name(Project.TIME_OFF.value)
 
 
 # Example: Attempting a prompt injection attack
@@ -124,14 +125,27 @@ Question is within the forbidden semantic space
 
 The SDK provides various clients to interact with different parts of the Engine API.
 
+### Fence Client
+
+The `FenceClient` validates text against a project's semantic fence rules.
+
+```python
+fence_client = client.get_fence_client()
+result = fence_client.validate(project_id=project.id, text="Some user input")
+```
+
+**Available methods**:
+
+* `validate`: Validate a text against the fence rules of a given project. Returns a `FenceValidation` with `valid` and `reason_code` fields.
+
 ### Project Client
 
-To interact with projects, use the `ProjectClient`. It allows you to create, find, update, and delete projects.
+To interact with projects, use the `ProjectClient`. It lets you create, find, update, and delete projects, and manage their **builds** (versions).
 
 ```python
 # Load the project
 project_client = client.get_project_client()
-project = project_client.find_one_by_name(Project.MEDICARE.value)
+project = project_client.find_one_by_name(Project.TIME_OFF.value)
 print(f"Project Name: {project.name}")
 
 ```
@@ -139,13 +153,33 @@ print(f"Project Name: {project.name}")
 **Available methods**:
 | Method | Description |
 | :--- | :--- |
-| `create` | Create a new project. |
-| `find_all` | Retrieve all projects. This allows pagination using limit and offset parameters. |
+| `create` | Create a new project. Accepts build-config fields (`optimization_strategy`, `openai_llm`, `gemini_llm`, …). |
+| `find_all` | Retrieve projects with pagination. Requires `limit` and `offset` parameters. |
 | `find_one` | Retrieve a single project by its ID. |
 | `find_one_by_name` | Retrieve a single project by its name. |
-| `update` | Update an existing project. |
+| `update` | Partially update a project; only the fields you pass are sent (others are left unchanged). |
 | `delete` | Delete a project by its ID. |
-| `upload_zip` | Upload a zip file for the project. |
+| `upload_chained_zip` | Upload a chained zip file for the project (set `rewrite=True` to overwrite). |
+| `find_builds` | List all builds for a project. |
+| `find_build` | Retrieve a single build by its ID. |
+| `activate_build` | Make a specific build the project's active build. |
+| `update_build_notes` | Set, or clear (pass `None`), the notes on a build. |
+
+#### Build management
+
+A project owns a sequence of immutable **builds** (versions); exactly one build is *active*, and config edits land on a draft build.
+
+```python
+# List builds and read one back
+builds = project_client.find_builds(project.id)
+build = project_client.find_build(project.id, builds[0].id)
+
+# Promote a previous build to active
+project_client.activate_build(project.id, build.id)
+
+# Annotate a build (pass None to clear the note)
+project_client.update_build_notes(project.id, build.id, "production candidate")
+```
 
 ### Custom Settings Client
 
@@ -171,34 +205,76 @@ current_settings = settings_client.find_custom_settings()
 * `clear_llms_keys`: Clear all LLM API keys.
 * `find_custom_settings`: Retrieve the current configuration.
 
+### LLM Models Client
+
+The `LLMModelsClient` exposes the catalog of LLM models you can select as a project's `openai_llm` / `gemini_llm` build-config values.
+
+```python
+llm_models_client = client.get_llm_models_client()
+catalog = llm_models_client.find_llm_models()
+
+for model in catalog.openai:
+    print(f"{model.model} — {model.label} (recommended={model.recommended})")
+```
+
+**Available methods**:
+
+* `find_llm_models`: Retrieve the catalog of selectable OpenAI and Gemini models.
+* `refresh_llm_models`: Re-fetch the catalog from the upstream source.
+
 ### Builder Client
 
 The Builder Client allows you to trigger builds and retrieve generated data (accept/reject lists, logs, and metrics).
 
-**1. Trigger a Build**
+**1. Trigger a Full Build**
 
 ```python
 # Load the project
 project_client = client.get_project_client()
-project = project_client.find_one_by_name(Project.MEDICARE.value)
+project = project_client.find_one_by_name(Project.TIME_OFF.value)
 
 builder_client = client.get_builder_client()
 builder_client.build(project_id=project.id)
 ```
 
-**2. Retrieve Generated Data**
-The client offers specific methods to find lists, logs, and metrics by project ID.
+> An empty `build()` rebuilds the project's current config. Pass any config field (e.g. `optimization_strategy`, `openai_llm`, `gemini_llm`) or `notes` to override the draft before building.
+
+**2. Trigger a Quick Rebuild**
+
+A quick rebuild re-runs only the benchmark phase against an already-trained model, skipping dataset generation and training entirely. Use it when you want refreshed metrics and thresholds without retraining.
 
 ```python
-# Get lists
+# Check eligibility first
+project = project_client.find_one(project_id=42)
+
+if project.can_quick_rebuild:
+    builder_client = client.get_builder_client()
+    builder_client.quick_build(project_id=project.id, notes="Refreshed after threshold adjustment")
+```
+
+Poll `project_client.find_one(project_id)` and check `project.status` until it is `DONE` or `FAILED`.
+
+**3. Retrieve Generated Data**
+The client offers specific methods to find lists, logs, and metrics by project ID. Every artifact-retrieval method also accepts an optional `build_id` to target a specific build; when omitted, the project's **active** build is used.
+
+```python
+# Get lists (active build)
 accept_list = builder_client.find_project_accept_list(project.id)
 reject_list = builder_client.find_project_reject_list(project.id)
+
+# Target a specific build by its id
+accept_list_v2 = builder_client.find_project_accept_list(project.id, build_id=2)
 
 # Get specific files
 log_file = builder_client.find_project_log_by_name(project.id, "build_log_v1.txt")
 ```
 
 **Available methods**:
+
+* **Build Triggers:**
+* `build` — full build (dataset generation + training + benchmarks)
+* `quick_build` — benchmark-only rebuild; requires `project.can_quick_rebuild == True`
+
 
 * **List Retrieval:**
 * `find_project_accept_list`
@@ -221,18 +297,60 @@ log_file = builder_client.find_project_log_by_name(project.id, "build_log_v1.txt
 * `find_project_testing_summary`
 * `find_project_validation_summary`
 
+### Auth Client
+
+The `AuthClient` handles authentication and passphrase management. The SDK can authenticate transparently when you pass `passphrase` to the `SDK(...)` constructor, or you can use the client directly.
+
+```python
+auth_client = client.get_auth_client()
+
+# Sign in and obtain a JWT token
+token = auth_client.authenticate(passphrase="<your_passphrase>")
+
+# Rotate the passphrase
+auth_client.reset_passphrase(
+    reset_token="<reset_token_from_reset.txt>",
+    new_passphrase="<new_passphrase>",
+)
+
+# Sign out — invalidates the session and clears the cached Bearer token
+# from the SDK's REST client, so subsequent calls will be unauthenticated.
+auth_client.sign_out()
+```
+
+**Available methods**:
+
+* `authenticate`: Sign in with a passphrase and return a JWT token.
+* `reset_passphrase`: Replace the current passphrase with a new one.
+* `sign_out`: End the current session and remove the Authorization header from the SDK's REST client.
+
 ---
 
 ## Authentication & Passphrase Reset
 
-This API uses **JWT tokens**. To access protected endpoints, include the header `Authorization: Bearer <token>`. You can obtain a token by signing in at `/api/v1/auth/sign-in` using your passphrase.
+This API uses **JWT tokens**. To access protected endpoints, include the header `Authorization: Bearer <token>`. You can obtain a token by signing in at `/api/v1/auth/sign-in` using your passphrase. When you initialize the SDK with a `passphrase`, this is handled automatically.
 
 ### Resetting the Passphrase
 If you forget your passphrase or need to set it for the first time:
 
 1. **Retrieve the reset token** by running the following command in your terminal:
+
    ```bash
    docker exec {your-container-name} cat /apps/engine_api/input/reset.txt
+   ```
+
+2. **Use the reset token as your current passphrase** to set a new one via the SDK:
+
+   ```python
+   from crocotiger.sdk import SDK
+
+   client = SDK(base_path="http://localhost:8000/api/v1/")
+   auth_client = client.get_auth_client()
+   auth_client.reset_passphrase(
+       reset_token="<reset_token_from_reset.txt>",
+       new_passphrase="<your_new_passphrase>",
+   )
+   ```
 
 ---
 

@@ -88,6 +88,25 @@ def test_add_authorization_token(mocker):
     assert client.headers["Authorization"] == "Bearer my-jwt-token"
 
 
+def test_remove_authorization_token():
+    """Verifies remove_authorization_token strips the Bearer header."""
+    client = RestClient("http://api.com")
+    client.add_authorization_token("my-jwt-token")
+
+    client.remove_authorization_token()
+
+    assert "Authorization" not in client.headers
+
+
+def test_remove_authorization_token_when_absent_is_noop():
+    """Verifies remove_authorization_token is safe when no token was set."""
+    client = RestClient("http://api.com")
+
+    client.remove_authorization_token()
+
+    assert "Authorization" not in client.headers
+
+
 def test_get(mocker):
     """Verifies the GET method calls requests.get with correct params."""
     client = RestClient("http://api.com")
@@ -156,3 +175,29 @@ def test_delete(mocker):
 
     mock_delete.assert_called_once_with("http://api.com/test/1", headers=client.headers)
     assert result == {"status": "deleted"}
+
+
+def test_upload_file_keeps_auth_and_drops_content_type(mocker, tmp_path):
+    """Verifies upload_file keeps the auth header but drops Content-Type so
+    requests can set the multipart/form-data boundary itself."""
+    client = RestClient("http://api.com")
+    client.add_authorization_token("my-jwt-token")
+    mock_post = mocker.patch("requests.post")
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = {"data": {"name": "data.zip"}}
+
+    zip_file = tmp_path / "data.zip"
+    zip_file.write_bytes(b"PK\x03\x04")
+
+    result = client.upload_file("/upload", str(zip_file), params={"rewrite": "true"})
+
+    assert result == {"name": "data.zip"}
+    args, kwargs = mock_post.call_args
+    assert args[0] == "http://api.com/upload"
+    assert kwargs["headers"]["Authorization"] == "Bearer my-jwt-token"
+    assert kwargs["headers"]["Accept"] == "application/json"
+    assert "Content-Type" not in kwargs["headers"]
+    assert "file" in kwargs["files"]
+    assert kwargs["params"] == {"rewrite": "true"}
+    # the original client headers must be left intact for other (JSON) calls
+    assert client.headers["Content-Type"] == "application/json"

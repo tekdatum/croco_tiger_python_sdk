@@ -26,7 +26,9 @@ def test_validate(mock_rest_client):
         "text": "Some text",
         "valid": True,
         "reason_code": "OK",
+        "category": "IN_TOPIC",
         "duration": 0.5,
+        "extra": {"accept_score": 0.91, "reject_score": 0.11},
     }
     mock_rest_client.post.return_value = mock_data
 
@@ -38,6 +40,8 @@ def test_validate(mock_rest_client):
     assert isinstance(result, FenceValidation)
     assert result.text == mock_data["text"]
     assert result.valid == mock_data["valid"]
+    assert result.category == "IN_TOPIC"
+    assert result.extra["accept_score"] == 0.91
 
     expected_url = f"/fence/validate/{project_id}"
     mock_rest_client.post.assert_called_once_with(

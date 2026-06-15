@@ -16,6 +16,9 @@ class RestClient:
     def add_authorization_token(self, token: str) -> None:
         self.headers["Authorization"] = f"Bearer {token}"
 
+    def remove_authorization_token(self) -> None:
+        self.headers.pop("Authorization", None)
+
     def _handle_response(self, response: requests.Response) -> Any:
         if 200 <= response.status_code < 300:
             json_response = response.json()
@@ -47,11 +50,14 @@ class RestClient:
         self, endpoint: str, file_path: str, params: Optional[Dict[str, Any]] = None
     ) -> Any:
         url = self._prepare_url(endpoint)
+        # Multipart upload: keep auth/accept but drop our default
+        # "Content-Type: application/json" so requests sets the
+        # "multipart/form-data; boundary=..." header itself. Sending the JSON
+        # content type suppresses the boundary and the server can't parse the file.
+        headers = {k: v for k, v in self.headers.items() if k.lower() != "content-type"}
         with open(file_path, "rb") as f:
             files = {"file": f}
-            response = requests.post(
-                url, headers={"Accept": "application/json"}, files=files, params=params
-            )
+            response = requests.post(url, headers=headers, files=files, params=params)
         return self._handle_response(response)
 
     def put(self, endpoint: str, data: Dict[str, Any]) -> Any:
