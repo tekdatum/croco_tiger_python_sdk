@@ -292,3 +292,36 @@ def test_find_project_validation_summary_with_build_id(mock_rest_client):
         "/builder/summary/validation/123", params={"build_id": 5}
     )
     assert result == ["validation_summary"]
+
+
+def test_quick_build_without_notes(mock_rest_client):
+    """Verifies quick_build calls put with empty body when notes is not provided."""
+    client = BuilderClient(mock_rest_client)
+    mock_rest_client.put.return_value = {
+        "success": True,
+        "reason": "Quick build started",
+    }
+
+    result = client.quick_build(123)
+
+    mock_rest_client.put.assert_called_once_with("/builder/quick-build/123", data={})
+    assert result == {"success": True, "reason": "Quick build started"}
+
+
+def test_quick_build_with_notes(mock_rest_client):
+    """Verifies quick_build includes notes in the request body when provided."""
+    client = BuilderClient(mock_rest_client)
+    mock_rest_client.put.return_value = {
+        "success": True,
+        "reason": "Quick build started",
+    }
+
+    result = client.quick_build(
+        123, notes="Refreshing benchmarks after threshold adjustment"
+    )
+
+    mock_rest_client.put.assert_called_once_with(
+        "/builder/quick-build/123",
+        data={"notes": "Refreshing benchmarks after threshold adjustment"},
+    )
+    assert result == {"success": True, "reason": "Quick build started"}

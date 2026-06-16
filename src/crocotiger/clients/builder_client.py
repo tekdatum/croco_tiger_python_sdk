@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from crocotiger.utils.rest import RestClient
 
 
@@ -45,6 +45,17 @@ class BuilderClient:
         payload = {k: v for k, v in candidate.items() if v is not None}
         data = self._rest_client.put(
             f"{self.base_path}/build/{project_id}", data=payload
+        )
+        return dict(data)
+
+    def quick_build(
+        self, project_id: int, notes: Optional[str] = None
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {}
+        if notes is not None:
+            body["notes"] = notes
+        data = self._rest_client.put(
+            f"{self.base_path}/quick-build/{project_id}", data=body
         )
         return dict(data)
 
