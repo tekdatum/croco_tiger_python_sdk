@@ -75,6 +75,16 @@ def test_find_project_accept_list(mock_rest_client):
     assert result == {"item": "allowed"}
 
 
+def test_find_project_accept_list_with_list_response(mock_rest_client):
+    """Verifies find_project_accept_list handles a list payload without TypeError."""
+    client = BuilderClient(mock_rest_client)
+    mock_rest_client.get.return_value = [{"word": "foo"}, {"word": "bar"}]
+
+    result = client.find_project_accept_list(123)
+
+    assert result == [{"word": "foo"}, {"word": "bar"}]
+
+
 def test_find_project_accept_list_with_build_id(mock_rest_client):
     """Verifies find_project_accept_list passes build_id as a query param."""
     client = BuilderClient(mock_rest_client)
@@ -99,6 +109,16 @@ def test_find_project_reject_list(mock_rest_client):
         "/builder/generated/123/reject_list", params=None
     )
     assert result == {"item": "blocked"}
+
+
+def test_find_project_reject_list_with_list_response(mock_rest_client):
+    """Verifies find_project_reject_list handles a list payload without TypeError."""
+    client = BuilderClient(mock_rest_client)
+    mock_rest_client.get.return_value = [{"word": "spam"}, {"word": "malicious"}]
+
+    result = client.find_project_reject_list(123)
+
+    assert result == [{"word": "spam"}, {"word": "malicious"}]
 
 
 def test_find_project_reject_list_with_build_id(mock_rest_client):

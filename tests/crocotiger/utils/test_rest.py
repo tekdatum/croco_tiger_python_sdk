@@ -20,6 +20,17 @@ def test_prepare_url():
     assert url == "http://api.com/users"
 
 
+def test_handle_response_null_json_body(mocker):
+    """Verifies _handle_response handles a 200 with a null body without TypeError."""
+    client = RestClient("http://api.com")
+    mock_response = mocker.Mock(spec=requests.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = None
+
+    result = client._handle_response(mock_response)
+    assert result is None
+
+
 def test_handle_response_success_with_data(mocker):
     """Verifies that _handle_response extracts the 'data' key when present."""
     client = RestClient("http://api.com")
@@ -126,12 +137,24 @@ def test_get_file(mocker):
     """Verifies the get_file method returns the raw content bytes."""
     client = RestClient("http://api.com")
     mock_get = mocker.patch("requests.get")
+    mock_get.return_value.status_code = 200
     mock_get.return_value.content = b"raw_data"
 
     result = client.get_file("/download")
 
     assert result == b"raw_data"
     mock_get.assert_called_once()
+
+
+def test_get_file_raises_on_error(mocker):
+    """Verifies get_file raises ApiErrorResponse on error, not raw bytes."""
+    client = RestClient("http://api.com")
+    mock_get = mocker.patch("requests.get")
+    mock_get.return_value.status_code = 404
+    mock_get.return_value.json.return_value = {"status": "fail", "message": "not found"}
+
+    with pytest.raises(ApiErrorResponse):
+        client.get_file("/missing-file")
 
 
 def test_post(mocker):
