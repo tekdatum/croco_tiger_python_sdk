@@ -3,6 +3,7 @@ import pytest
 from datetime import datetime
 
 from crocotiger.clients.fence_client import FenceClient
+from crocotiger.models.fence_correction import FenceCorrection
 from crocotiger.models.fence_event import FenceEvent, FenceEventPage
 from crocotiger.models.fence_validation import FenceValidation
 
@@ -49,6 +50,41 @@ def test_validate(mock_rest_client):
     expected_url = f"/fence/validate/{project_id}"
     mock_rest_client.post.assert_called_once_with(
         expected_url, data={"text": text_to_validate}
+    )
+
+
+def test_commit_corrections(mock_rest_client):
+    """Verifies commit_corrections posts all corrections serialised as dicts."""
+    client = FenceClient(mock_rest_client)
+    mock_rest_client.post.return_value = None
+
+    corrections = [
+        FenceCorrection(text="bad text", valid=False, category="ATTACK"),
+        FenceCorrection(text="good text", valid=True),
+    ]
+
+    client.commit_corrections(123, corrections)
+
+    mock_rest_client.post.assert_called_once_with(
+        "/fence/commit/123",
+        data={
+            "corrections": [
+                {"text": "bad text", "valid": False, "category": "ATTACK"},
+                {"text": "good text", "valid": True, "category": None},
+            ]
+        },
+    )
+
+
+def test_commit_corrections_empty_raises(mock_rest_client):
+    """Verifies commit_corrections with an empty list still calls the endpoint."""
+    client = FenceClient(mock_rest_client)
+    mock_rest_client.post.return_value = None
+
+    client.commit_corrections(123, [])
+
+    mock_rest_client.post.assert_called_once_with(
+        "/fence/commit/123", data={"corrections": []}
     )
 
 

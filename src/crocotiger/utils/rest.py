@@ -24,6 +24,9 @@ class RestClient:
     ) -> Any:
         if 200 <= response.status_code < 300:
             json_response = response.json()
+
+            if json_response is None:
+                return None
             return (
                 json_response["data"]
                 if extract_data and "data" in json_response
@@ -50,6 +53,11 @@ class RestClient:
     def get_file(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> bytes:
         url = self._prepare_url(endpoint)
         response = requests.get(url, headers=self.headers, params=params)
+        if not (200 <= response.status_code < 300):
+            try:
+                raise ApiErrorResponse.from_response(response)
+            except ValueError:
+                response.raise_for_status()
         return response.content
 
     def post(self, endpoint: str, data: Dict[str, Any]) -> Any:
