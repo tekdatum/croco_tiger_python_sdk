@@ -254,6 +254,16 @@ if project.can_quick_rebuild:
 
 Poll `project_client.find_one(project_id)` and check `project.status` until it is `DONE` or `FAILED`.
 
+**Stop a Build**
+Stop the build currently running for a project. Only the project's active build can be stopped, and only while it is `IN_PROGRESS`. The stopped build is marked `STOPPED` and the global build lock is released so a new build can start.
+
+```python
+builder_client = client.get_builder_client()
+builder_client.stop(project_id=project.id, notes="Cancelled — wrong dataset selected")
+```
+
+Raises `ApiErrorResponse` with code `404` (`project_not_found`) if the project does not exist, or `403` (`not_in_progress`) if there is no active `IN_PROGRESS` build to stop.
+
 **3. Retrieve Generated Data**
 The client offers specific methods to find lists, logs, and metrics by project ID. Every artifact-retrieval method also accepts an optional `build_id` to target a specific build; when omitted, the project's **active** build is used.
 
@@ -274,6 +284,7 @@ log_file = builder_client.find_project_log_by_name(project.id, "build_log_v1.txt
 * **Build Triggers:**
 * `build` — full build (dataset generation + training + benchmarks)
 * `quick_build` — benchmark-only rebuild; requires `project.can_quick_rebuild == True`
+* `stop` — stop the active `IN_PROGRESS` build; marks it `STOPPED`
 
 
 * **List Retrieval:**

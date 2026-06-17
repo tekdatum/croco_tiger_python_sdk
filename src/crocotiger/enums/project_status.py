@@ -7,3 +7,4 @@ class ProjectStatus(Enum):
     IN_PROGRESS = "in_progress"
     FAILED = "failed"
     DONE = "done"
+    STOPPED = "stopped"

@@ -40,6 +40,31 @@ def test_build_with_body(mock_rest_client):
     assert result == {"success": True, "reason": ""}
 
 
+def test_stop_without_notes(mock_rest_client):
+    """Verifies stop calls put with empty body when notes is not provided."""
+    client = BuilderClient(mock_rest_client)
+    mock_rest_client.put.return_value = {"success": True, "reason": ""}
+
+    result = client.stop(123)
+
+    mock_rest_client.put.assert_called_once_with("/builder/stop/123", data={})
+    assert result == {"success": True, "reason": ""}
+
+
+def test_stop_with_notes(mock_rest_client):
+    """Verifies stop includes notes in the request body when provided."""
+    client = BuilderClient(mock_rest_client)
+    mock_rest_client.put.return_value = {"success": True, "reason": ""}
+
+    result = client.stop(123, notes="Cancelled — wrong dataset selected")
+
+    mock_rest_client.put.assert_called_once_with(
+        "/builder/stop/123",
+        data={"notes": "Cancelled — wrong dataset selected"},
+    )
+    assert result == {"success": True, "reason": ""}
+
+
 def test_find_project_logs(mock_rest_client):
     """Verifies find_project_logs calls get and returns a list."""
     client = BuilderClient(mock_rest_client)

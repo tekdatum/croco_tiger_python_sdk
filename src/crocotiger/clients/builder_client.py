@@ -59,6 +59,18 @@ class BuilderClient:
         )
         return dict(data)
 
+    def stop(self, project_id: int, notes: Optional[str] = None) -> dict[str, Any]:
+        """Stop the in-progress build for a project and marks the build as STOPPED
+        so a new build can be started. ``notes`` is an optional reason appended to
+        the build's notes. Returns 404 (project_not_found) if the project does not
+        exist, or 403 (not_in_progress) if there is no active IN_PROGRESS build to
+        stop."""
+        body: dict[str, Any] = {}
+        if notes is not None:
+            body["notes"] = notes
+        data = self._rest_client.put(f"{self.base_path}/stop/{project_id}", data=body)
+        return dict(data)
+
     def find_project_logs(self, project_id: int) -> list[str]:
         data = self._rest_client.get(f"{self.base_path}/logs/{project_id}")
         return list(data)
