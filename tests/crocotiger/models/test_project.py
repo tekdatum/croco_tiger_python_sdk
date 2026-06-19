@@ -80,7 +80,7 @@ class TestProject:
             "topic": "AI Testing",
             "context": "A test context",
             "total_topic_questions": 5000,
-            "optimization_strategy": "f_beta",
+            "optimization_strategy": "broad",
         }
         project = Project(
             id=1,
@@ -94,7 +94,7 @@ class TestProject:
             accept_threshold=0.5,
             reject_threshold=0.7,
             created_at=datetime.now(),
-            optimization_strategy="f_beta",
+            optimization_strategy="broad",
             openai_llm="gpt-4o",
             can_quick_rebuild=True,
             active_build=build_data,
