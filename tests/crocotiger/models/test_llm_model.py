@@ -13,12 +13,21 @@ def test_llm_models_parses_full_payload():
             }
         ],
         gemini=[{"model": "gemini-2.0-flash", "label": "Gemini 2.0 Flash"}],
+        deepseek=[{"model": "deepseek-chat", "label": "DeepSeek Chat"}],
     )
 
     assert isinstance(models.openai[0], LLMModel)
     assert models.openai[0].recommended is True
     assert models.gemini[0].message is None
     assert models.gemini[0].recommended is False
+    assert isinstance(models.deepseek[0], LLMModel)
+    assert models.deepseek[0].model == "deepseek-chat"
+
+
+def test_llm_models_coerces_null_deepseek_to_empty():
+    """Verifies a null provider list (backward-compat deepseek) becomes []."""
+    models = LLMModels(openai=[], gemini=[], deepseek=None)
+    assert models.deepseek == []
 
 
 def test_llm_model_defaults():
@@ -29,7 +38,8 @@ def test_llm_model_defaults():
 
 
 def test_llm_models_defaults_empty_lists():
-    """Verifies the catalog defaults to empty openai/gemini lists."""
+    """Verifies the catalog defaults to empty openai/gemini/deepseek lists."""
     models = LLMModels()
     assert models.openai == []
     assert models.gemini == []
+    assert models.deepseek == []
