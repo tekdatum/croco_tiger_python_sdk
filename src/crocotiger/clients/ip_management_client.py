@@ -2,7 +2,9 @@ from typing import Any
 
 from crocotiger.enums.geo_block_type import GeoBlockType
 from crocotiger.models.geo_block import GeoBlock
+from crocotiger.models.geo_region import GeoRegionsSummary
 from crocotiger.models.ip_block import IPBlock
+from crocotiger.models.ip_summary import IPSummary
 from crocotiger.utils.rest import RestClient
 
 
@@ -11,9 +13,9 @@ class IPManagementClient:
         self._rest_client = rest_client
         self._endpoint = "/ip-management"
 
-    def list_ips(self, project_id: int) -> list[dict[str, Any]]:
+    def list_ips(self, project_id: int) -> list[IPSummary]:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}/ips")
-        return list(data)
+        return [IPSummary(**item) for item in data]
 
     def list_blocked_ips(self, project_id: int) -> list[IPBlock]:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}/blocked")
@@ -29,9 +31,9 @@ class IPManagementClient:
     def unblock_ip(self, project_id: int, ip_address: str) -> None:
         self._rest_client.delete(f"{self._endpoint}/{project_id}/block/{ip_address}")
 
-    def list_regions(self, project_id: int) -> dict[str, Any]:
+    def list_regions(self, project_id: int) -> GeoRegionsSummary:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}/regions")
-        return dict(data)
+        return GeoRegionsSummary(**data)
 
     def list_geo_blocks(self, project_id: int) -> list[GeoBlock]:
         data = self._rest_client.get(f"{self._endpoint}/{project_id}/geo-blocks")
