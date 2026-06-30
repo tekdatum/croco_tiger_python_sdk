@@ -18,6 +18,8 @@ def sample_settings_data():
         "id": 1,
         "openai_key": "sk-123",
         "gemini_key": "gm-456",
+        "deepseek_key": "ds-789",
+        "otlp_endpoint": "https://otlp.example.com",
         "created_at": datetime.now(),
         "updated_at": datetime.now(),
     }
@@ -62,6 +64,29 @@ def test_update_custom_settings(mock_rest_client, sample_settings_data):
     assert result.openai_key == "sk-123"  # Value from sample_settings_data
 
 
+def test_update_custom_settings_with_deepseek_and_otlp(
+    mock_rest_client, sample_settings_data
+):
+    """Verifies deepseek_key and otlp_endpoint are forwarded when provided."""
+    client = CustomSettingsClient(mock_rest_client)
+    mock_rest_client.put.return_value = sample_settings_data
+
+    result = client.update_custom_settings(
+        deepseek_key="ds-789", otlp_endpoint="https://otlp.example.com"
+    )
+
+    mock_rest_client.put.assert_called_once_with(
+        "/custom-settings",
+        data={
+            "deepseek_key": "ds-789",
+            "otlp_endpoint": "https://otlp.example.com",
+        },
+    )
+    assert isinstance(result, CustomSettings)
+    assert result.deepseek_key == "ds-789"
+    assert result.otlp_endpoint == "https://otlp.example.com"
+
+
 def test_clear_llms_keys(mock_rest_client, sample_settings_data):
     """Verifies clear_llms_keys calls the specific endpoint with empty data."""
     # Arrange
@@ -93,4 +118,48 @@ def test_clear_llms_keys_returns_none_when_no_settings(mock_rest_client):
 
     # Assert
     mock_rest_client.put.assert_called_once_with("/custom-settings/clear-keys", data={})
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    "method_name, endpoint",
+    [
+        ("delete_openai_key", "/custom-settings/openai-key"),
+        ("delete_gemini_key", "/custom-settings/gemini-key"),
+        ("delete_deepseek_key", "/custom-settings/deepseek-key"),
+        ("delete_otlp_endpoint", "/custom-settings/otlp-endpoint"),
+    ],
+)
+def test_delete_single_setting(
+    mock_rest_client, sample_settings_data, method_name, endpoint
+):
+    """Each individual clear route DELETEs its endpoint and parses the result."""
+    client = CustomSettingsClient(mock_rest_client)
+    mock_rest_client.delete.return_value = sample_settings_data
+
+    result = getattr(client, method_name)()
+
+    mock_rest_client.delete.assert_called_once_with(endpoint)
+    assert isinstance(result, CustomSettings)
+
+
+@pytest.mark.parametrize(
+    "method_name, endpoint",
+    [
+        ("delete_openai_key", "/custom-settings/openai-key"),
+        ("delete_gemini_key", "/custom-settings/gemini-key"),
+        ("delete_deepseek_key", "/custom-settings/deepseek-key"),
+        ("delete_otlp_endpoint", "/custom-settings/otlp-endpoint"),
+    ],
+)
+def test_delete_single_setting_returns_none_when_no_settings(
+    mock_rest_client, method_name, endpoint
+):
+    """Each individual clear route returns None when the server responds with null."""
+    client = CustomSettingsClient(mock_rest_client)
+    mock_rest_client.delete.return_value = None
+
+    result = getattr(client, method_name)()
+
+    mock_rest_client.delete.assert_called_once_with(endpoint)
     assert result is None

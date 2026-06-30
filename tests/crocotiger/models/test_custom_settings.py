@@ -57,3 +57,28 @@ class TestCustomSettings:
             openai_key=None, gemini_key=None, created_at=datetime.now()
         )
         assert settings.is_invalid()
+
+    def test_trimmed_deepseek_key_when_gt_4_characters(self) -> None:
+        settings = CustomSettings(
+            deepseek_key="SECRET_DEEPSEEK_1234", created_at=datetime.now()
+        )
+        assert settings.trimmed_deepseek_key == "1234"
+
+    def test_trimmed_deepseek_key_when_not_provided(self) -> None:
+        settings = CustomSettings(deepseek_key=None, created_at=datetime.now())
+        assert settings.trimmed_deepseek_key is None
+
+    def test_is_invalid_when_only_deepseek_key(self) -> None:
+        settings = CustomSettings(
+            openai_key=None,
+            gemini_key=None,
+            deepseek_key="1234",
+            created_at=datetime.now(),
+        )
+        assert not settings.is_invalid()
+
+    def test_otlp_endpoint_round_trips(self) -> None:
+        settings = CustomSettings(
+            otlp_endpoint="https://otlp.example.com", created_at=datetime.now()
+        )
+        assert settings.otlp_endpoint == "https://otlp.example.com"
