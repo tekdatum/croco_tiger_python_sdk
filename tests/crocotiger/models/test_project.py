@@ -62,6 +62,7 @@ class TestProject:
         assert project.optimization_strategy == OptimizationStrategy.BALANCED
         assert project.openai_llm is None
         assert project.gemini_llm is None
+        assert project.deepseek_llm is None
         assert project.can_quick_rebuild is False
         assert project.active_build is None
         assert project.latest_build is None

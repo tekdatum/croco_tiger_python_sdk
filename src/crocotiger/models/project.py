@@ -29,6 +29,7 @@ class Project(BaseModel):
     optimization_strategy: OptimizationStrategy = OptimizationStrategy.BALANCED
     openai_llm: str | None = None
     gemini_llm: str | None = None
+    deepseek_llm: str | None = None
     can_quick_rebuild: bool = False
     active_build: ProjectBuild | None = None
     latest_build: ProjectBuild | None = None

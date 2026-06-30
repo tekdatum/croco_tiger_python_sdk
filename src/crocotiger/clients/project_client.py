@@ -21,6 +21,7 @@ class ProjectClient:
         optimization_strategy: str | None = None,
         openai_llm: str | None = None,
         gemini_llm: str | None = None,
+        deepseek_llm: str | None = None,
     ) -> Project:
         """Create a project. Optional fields left as None are omitted from the
         payload, so the server-side defaults apply."""
@@ -37,6 +38,7 @@ class ProjectClient:
             "optimization_strategy": optimization_strategy,
             "openai_llm": openai_llm,
             "gemini_llm": gemini_llm,
+            "deepseek_llm": deepseek_llm,
         }
         payload.update({k: v for k, v in optional.items() if v is not None})
         data = self._rest_client.post(f"{self._endpoint}", data=payload)
@@ -60,6 +62,7 @@ class ProjectClient:
         optimization_strategy: str | None = None,
         openai_llm: str | None = None,
         gemini_llm: str | None = None,
+        deepseek_llm: str | None = None,
     ) -> Project:
         """Partially update a project. Fields left as None are omitted from the
         payload and remain unchanged server-side (clearing a nullable field by
@@ -76,6 +79,7 @@ class ProjectClient:
             "optimization_strategy": optimization_strategy,
             "openai_llm": openai_llm,
             "gemini_llm": gemini_llm,
+            "deepseek_llm": deepseek_llm,
         }
         payload = {k: v for k, v in candidate.items() if v is not None}
         data = self._rest_client.put(f"{self._endpoint}/{project_id}", data=payload)

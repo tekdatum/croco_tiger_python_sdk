@@ -58,6 +58,7 @@ class TestProjectBuild:
         assert build.optimization_strategy == OptimizationStrategy.BALANCED
         assert build.openai_llm is None
         assert build.gemini_llm is None
+        assert build.deepseek_llm is None
 
     def test_missing_field(self) -> None:
         # "project_id" is missing
