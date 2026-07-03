@@ -3,7 +3,9 @@ import pytest
 from crocotiger.clients.ip_management_client import IPManagementClient
 from crocotiger.enums.geo_block_type import GeoBlockType
 from crocotiger.models.geo_block import GeoBlock
+from crocotiger.models.geo_region import GeoRegionsSummary
 from crocotiger.models.ip_block import IPBlock
+from crocotiger.models.ip_summary import IPSummary
 
 PROJECT_ID = 42
 
@@ -46,12 +48,36 @@ def test_init(mock_rest_client):
 
 def test_list_ips(mock_rest_client):
     client = IPManagementClient(mock_rest_client)
-    raw = [{"ip_address": "1.2.3.4", "is_blocked": True, "request_count": 5}]
+    raw = [
+        {
+            "ip_address": "1.2.3.4",
+            "total_requests": 5,
+            "fence_accepted_count": 3,
+            "fence_rejected_count": 2,
+            "last_seen": "2024-01-01T00:00:00",
+            "is_blocked": True,
+            "is_geo_blocked": False,
+            "ip_blocked_count": 1,
+            "region_blocked_count": 0,
+            "location": {
+                "country": "United States",
+                "country_code": "US",
+                "city": "Miami",
+                "isp": "Acme ISP",
+            },
+        }
+    ]
     mock_rest_client.get.return_value = raw
 
     result = client.list_ips(PROJECT_ID)
 
-    assert result == raw
+    assert len(result) == 1
+    assert isinstance(result[0], IPSummary)
+    assert result[0].ip_address == "1.2.3.4"
+    assert result[0].total_requests == 5
+    assert result[0].is_blocked is True
+    assert result[0].location is not None
+    assert result[0].location.country_code == "US"
     mock_rest_client.get.assert_called_once_with(f"/ip-management/{PROJECT_ID}/ips")
 
 
@@ -99,16 +125,25 @@ def test_list_regions(mock_rest_client):
             {
                 "country": "China",
                 "country_code": "CN",
-                "request_count": 100,
+                "total_requests": 100,
+                "fence_accepted_count": 40,
+                "fence_rejected_count": 60,
                 "is_blocked": True,
+                "ip_blocked_count": 2,
+                "region_blocked_count": 1,
             }
         ],
         "cities": [
             {
                 "city": "Beijing",
+                "country": "China",
                 "country_code": "CN",
-                "request_count": 50,
+                "total_requests": 50,
+                "fence_accepted_count": 20,
+                "fence_rejected_count": 30,
                 "is_blocked": False,
+                "ip_blocked_count": 0,
+                "region_blocked_count": 0,
             }
         ],
     }
@@ -116,7 +151,14 @@ def test_list_regions(mock_rest_client):
 
     result = client.list_regions(PROJECT_ID)
 
-    assert result == raw
+    assert isinstance(result, GeoRegionsSummary)
+    assert len(result.countries) == 1
+    assert result.countries[0].country_code == "CN"
+    assert result.countries[0].total_requests == 100
+    assert result.countries[0].is_blocked is True
+    assert len(result.cities) == 1
+    assert result.cities[0].city == "Beijing"
+    assert result.cities[0].total_requests == 50
     mock_rest_client.get.assert_called_once_with(f"/ip-management/{PROJECT_ID}/regions")
 
 

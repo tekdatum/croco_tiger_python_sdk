@@ -6,6 +6,8 @@ class CustomSettings(BaseModel):
     id: int | None = None
     openai_key: str | None = None
     gemini_key: str | None = None
+    deepseek_key: str | None = None
+    otlp_endpoint: str | None = None
     created_at: datetime
     updated_at: datetime | None = None
 
@@ -17,5 +19,13 @@ class CustomSettings(BaseModel):
     def trimmed_gemini_key(self) -> str | None:
         return self.gemini_key[-4:] if self.gemini_key is not None else None
 
+    @property
+    def trimmed_deepseek_key(self) -> str | None:
+        return self.deepseek_key[-4:] if self.deepseek_key is not None else None
+
     def is_invalid(self) -> bool:
-        return self.openai_key is None and self.gemini_key is None
+        return (
+            self.openai_key is None
+            and self.gemini_key is None
+            and self.deepseek_key is None
+        )

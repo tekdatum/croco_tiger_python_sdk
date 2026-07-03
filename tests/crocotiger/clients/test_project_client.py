@@ -104,6 +104,7 @@ def test_create_with_config_fields(mock_rest_client, sample_project_data):
         optimization_strategy="f_beta",
         openai_llm="gpt-4o",
         gemini_llm="gemini-2.0-flash",
+        deepseek_llm="deepseek-chat",
     )
 
     mock_rest_client.post.assert_called_once_with(
@@ -115,6 +116,7 @@ def test_create_with_config_fields(mock_rest_client, sample_project_data):
             "optimization_strategy": "f_beta",
             "openai_llm": "gpt-4o",
             "gemini_llm": "gemini-2.0-flash",
+            "deepseek_llm": "deepseek-chat",
         },
     )
 

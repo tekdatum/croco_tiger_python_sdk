@@ -25,6 +25,7 @@ class BuilderClient:
         optimization_strategy: str | None = None,
         openai_llm: str | None = None,
         gemini_llm: str | None = None,
+        deepseek_llm: str | None = None,
     ) -> dict[bool, str]:
         """Start a full build. Fields left as None are omitted from the payload
         and keep the current draft/active config; an empty body rebuilds the
@@ -41,6 +42,7 @@ class BuilderClient:
             "optimization_strategy": optimization_strategy,
             "openai_llm": openai_llm,
             "gemini_llm": gemini_llm,
+            "deepseek_llm": deepseek_llm,
         }
         payload = {k: v for k, v in candidate.items() if v is not None}
         data = self._rest_client.put(

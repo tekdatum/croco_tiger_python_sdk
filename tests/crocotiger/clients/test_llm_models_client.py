@@ -30,6 +30,14 @@ def sample_llm_models_data():
                 "recommended": False,
             }
         ],
+        "deepseek": [
+            {
+                "model": "deepseek-chat",
+                "label": "DeepSeek Chat",
+                "message": "",
+                "recommended": False,
+            }
+        ],
     }
 
 
@@ -51,6 +59,7 @@ def test_find_llm_models(mock_rest_client, sample_llm_models_data):
     assert isinstance(result, LLMModels)
     assert result.openai[0].model == "gpt-4o"
     assert result.gemini[0].label == "Gemini 2.0 Flash"
+    assert result.deepseek[0].model == "deepseek-chat"
 
 
 def test_refresh_llm_models(mock_rest_client, sample_llm_models_data):
